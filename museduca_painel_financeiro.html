@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MUSEDUCA — Painel Financeiro</title>
+<style>
+  :root{
+    --bg: #14181c;
+    --bg-panel: #191e23;
+    --bg-raised: #1f252b;
+    --bg-raised-2: #242b32;
+    --border: #2a323a;
+    --border-soft: #232a30;
+    --text: #e9e6df;
+    --text-muted: #97a0a8;
+    --text-dim: #5f6870;
+    --paid: #4f9d8f;
+    --paid-soft: rgba(79,157,143,0.14);
+    --pending: #ce9d4f;
+    --pending-soft: rgba(206,157,79,0.14);
+    --danger: #bd5f4c;
+    --danger-soft: rgba(189,95,76,0.15);
+    --info: #6f8ba6;
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
+    --mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html,body{
+    margin:0; padding:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body{
+    background-image:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(111,139,166,0.06), transparent),
+      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(206,157,79,0.05), transparent);
+    background-attachment: fixed;
+  }
+
+  .wrap{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 48px 28px 100px;
+  }
+
+  /* ===== HEADER ===== */
+  .masthead{
+    display:flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+  .masthead-eyebrow{
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+  .masthead h1{
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 34px;
+    letter-spacing: 0.01em;
+    margin: 0 0 8px;
+    color: var(--text);
+  }
+  .masthead p{
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 560px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .masthead-meta{
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--text-dim);
+    line-height: 1.9;
+  }
+  .masthead-meta b{ color: var(--text-muted); font-weight: 500; }
+
+  section{ margin-bottom: 56px; }
+  .section-head{
+    display:flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .section-num{
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+  .section-head h2{
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 20px;
+    margin: 0;
+    color: var(--text);
+  }
+  .section-head .rule{
+    flex: 1;
+    height: 1px;
+    background: var(--border-soft);
+  }
+
+  /* ===== RESUMO EXECUTIVO ===== */
+  .resumo-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 220px;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  @media (max-width: 900px){
+    .resumo-grid{ grid-template-columns: 1fr 1fr; }
+  }
+  .stat-card{
+    background: var(--bg-panel);
+    padding: 24px 22px;
+    display:flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 128px;
+  }
+  .stat-label{
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+  .stat-value{
+    font-family: var(--mono);
+    font-size: 27px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .stat-value.paid{ color: var(--paid); }
+  .stat-value.pending{ color: var(--pending); }
+  .stat-sub{
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 6px;
+    font-family: var(--mono);
+  }
+
+  .seal-card{
+    background: var(--bg-panel);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    padding: 18px;
+  }
+  .seal-pct{
+    font-family: var(--mono);
+    font-size: 12px;
+    fill: var(--text);
+  }
+  .seal-caption{
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 10px;
+    text-align: center;
+  }
+
+  /* ===== VISÃO POR FASE ===== */
+  .fase-row{
+    display: grid;
+    grid-template-columns: 240px 1fr 260px;
+    gap: 20px;
+    align-items: center;
+    padding: 22px 24px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+  }
+  .fase-row + .fase-row{ border-top: none; margin-top: -1px; }
+  @media (max-width: 760px){
+    .fase-row{ grid-template-columns: 1fr; gap: 10px; }
+  }
+  .fase-name{
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--text);
+  }
+  .fase-name .fase-tag{
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    background: var(--bg-raised);
+    border: 1px solid var(--border-soft);
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin-bottom: 8px;
+  }
+  .fase-name small{
+    display:block;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 6px;
+    letter-spacing: 0.02em;
+  }
+  .fase-track{
+    position: relative;
+    height: 26px;
+    background: var(--bg-raised);
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid var(--border-soft);
+  }
+  .fase-figures{
+    font-family: var(--mono);
+    font-size: 13px;
+    text-align: right;
+    color: var(--text-muted);
+    line-height: 1.75;
+  }
+  .fase-figures .p{ color: var(--paid); }
+  .fase-figures .q{ color: var(--pending); }
+  .fase-figures .pct{
+    font-size: 20px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* ===== VISÃO POR EIXO ===== */
+  .eixo-row{
+    display: grid;
+    grid-template-columns: 240px 1fr 260px;
+    gap: 20px;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .eixo-row:first-of-type{ border-top: 1px solid var(--border-soft); }
+  @media (max-width: 760px){
+    .eixo-row{ grid-template-columns: 1fr; gap: 10px; }
+  }
+  .eixo-name{
+    font-family: var(--serif);
+    font-size: 15.5px;
+    color: var(--text);
+  }
+  .eixo-name small{
+    display:block;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    letter-spacing: 0.03em;
+  }
+  .bar-track{
+    position: relative;
+    height: 22px;
+    background: var(--bg-raised);
+    border-radius: 2px;
+    overflow: hidden;
+    border: 1px solid var(--border-soft);
+  }
+  .bar-fill{ position:absolute; top:0; left:0; height:100%; background: var(--paid); }
+  .bar-fill.pending-fill{ background: var(--pending); left: auto; right: 0; }
+  .eixo-figures{
+    font-family: var(--mono);
+    font-size: 12px;
+    text-align: right;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+  .eixo-figures .p{ color: var(--paid); }
+  .eixo-figures .q{ color: var(--pending); }
+
+  /* ===== PENDÊNCIAS ===== */
+  .ledger{
+    border: 1px solid var(--border);
+  }
+  .ledger-head{
+    display:grid;
+    grid-template-columns: 108px 1fr 140px 120px;
+    gap: 14px;
+    padding: 10px 18px;
+    background: var(--bg-raised);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+  }
+  @media (max-width: 760px){
+    .ledger-head{ display:none; }
+  }
+  .ledger-row{
+    display:grid;
+    grid-template-columns: 108px 1fr 140px 120px;
+    gap: 14px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border-soft);
+    align-items: start;
+    background: var(--bg-panel);
+  }
+  .ledger-row:last-child{ border-bottom: none; }
+  @media (max-width: 760px){
+    .ledger-row{ grid-template-columns: 1fr; gap: 6px; }
+  }
+  .ledger-tag{
+    font-family: var(--mono);
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    display: inline-block;
+    width: fit-content;
+    white-space: nowrap;
+    height: fit-content;
+  }
+  .tag-overdue{ background: var(--danger-soft); color: var(--danger); border: 1px solid rgba(189,95,76,0.35); }
+  .tag-soon{ background: var(--pending-soft); color: var(--pending); border: 1px solid rgba(206,157,79,0.35); }
+  .tag-normal{ background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid var(--border-soft); }
+  .tag-unclear{ background: rgba(111,139,166,0.12); color: var(--info); border: 1px solid rgba(111,139,166,0.32); }
+  .tag-negociacao{ background: var(--pending-soft); color: var(--pending); border: 1px solid rgba(206,157,79,0.4); }
+  .tag-paid{ background: var(--paid-soft); color: var(--paid); border: 1px solid rgba(79,157,143,0.4); }
+
+  .prazo-hist{
+    margin-top: 4px;
+    padding-left: 10px;
+    border-left: 2px solid var(--border-soft);
+  }
+  .prazo-hist-row{
+    font-size: 10.5px;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+  .prazo-hist-row.current{ color: var(--pending); }
+  .prazo-hist-row .d{ font-family: var(--mono); }
+
+  .ledger-desc{ font-size: 13.5px; line-height: 1.5; }
+  .ledger-desc .eixo-tiny{
+    display:block;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 5px;
+    letter-spacing: 0.03em;
+  }
+  .ledger-desc .note{
+    display:block;
+    font-size: 11.5px;
+    color: var(--text-dim);
+    margin-top: 5px;
+    font-style: italic;
+    line-height: 1.4;
+  }
+  .ledger-prazo{
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+  .ledger-prazo .days{
+    display:block;
+    font-size: 10.5px;
+    margin-top: 3px;
+  }
+  .ledger-valor{
+    font-family: var(--mono);
+    font-size: 14px;
+    text-align: right;
+    color: var(--pending);
+    font-weight: 500;
+  }
+  @media (max-width: 760px){ .ledger-valor{ text-align:left; } }
+
+  /* ===== ANÁLISES ===== */
+  .analysis-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+  @media (max-width: 760px){
+    .analysis-grid{ grid-template-columns: 1fr; }
+  }
+  .analysis-card{
+    background: var(--bg-panel);
+    padding: 22px 24px;
+  }
+  .analysis-card .a-label{
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .a-label.risk{ color: var(--danger); }
+  .a-label.watch{ color: var(--pending); }
+  .a-label.info{ color: var(--info); }
+  .a-label.ok{ color: var(--paid); }
+  .analysis-card h3{
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 16px;
+    margin: 0 0 10px;
+    color: var(--text);
+  }
+  .analysis-card p{
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  .analysis-card p + p{ margin-top: 10px; }
+  .analysis-card .figure{
+    font-family: var(--mono);
+    color: var(--text);
+  }
+
+  footer{
+    border-top: 1px solid var(--border-soft);
+    padding-top: 22px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+  footer b{ color: var(--text-muted); }
+
+  /* ===== SEGMENTED PILL FILTER ===== */
+  .pill-group{
+    display:flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 26px;
+  }
+  .pill{
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 10px 22px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+    line-height: 1.2;
+  }
+  .pill:hover{ border-color: var(--text-dim); color: var(--text); }
+  .pill.active{
+    background: var(--paid);
+    border-color: var(--paid);
+    color: #0c1215;
+    font-weight: 700;
+  }
+  .pill-group.small .pill{ padding: 7px 16px; font-size: 11.5px; }
+  .pill-group.small{ margin-bottom: 18px; }
+  .fase-row.dimmed{ opacity: 0.4; }
+  .fase-row.selected{ border-color: var(--paid); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div>
+      <div class="masthead-eyebrow">SEDUC · OEI · IDG — Controle de Entregas e Recebimentos</div>
+      <h1>MUSEDUCA — Painel Financeiro</h1>
+      <p>Museu da Memória Educacional do Rio Grande do Sul · Instituto de Educação General Flores da Cunha, Porto Alegre.</p>
+    </div>
+    <div class="masthead-meta">
+      GERADO EM <b id="genDate"></b><br>
+      FONTE · Planilha de Controle de Entrega e Recebimentos<br>
+      2 FASES · 3 EIXOS · <span id="totalItensMeta"></span> ENTREGÁVEIS
+    </div>
+  </div>
+
+  <!-- ===================== RESUMO EXECUTIVO ===================== -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2>Resumo executivo</h2>
+      <div class="rule"></div>
+    </div>
+
+    <div class="pill-group" id="faseFilter">
+      <button class="pill active" data-fase="all">Visão consolidada</button>
+      <button class="pill" data-fase="Fase 1">Fase 1</button>
+      <button class="pill" data-fase="Fase 2">Fase 2</button>
+    </div>
+
+    <div class="resumo-grid">
+      <div class="stat-card">
+        <div class="stat-label">Valor total do projeto</div>
+        <div>
+          <div class="stat-value" id="statTotal">—</div>
+          <div class="stat-sub" id="statTotalSub">—</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total recebido</div>
+        <div>
+          <div class="stat-value paid" id="statPago">—</div>
+          <div class="stat-sub" id="statPagoSub">—</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total pendente</div>
+        <div>
+          <div class="stat-value pending" id="statPendente">—</div>
+          <div class="stat-sub" id="statPendenteSub">—</div>
+        </div>
+      </div>
+      <div class="seal-card">
+        <svg width="128" height="128" viewBox="0 0 128 128" id="sealSvg"></svg>
+        <div class="seal-caption">Execução<br>financeira</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VISÃO POR FASE ===================== -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2>Visão por fase</h2>
+      <div class="rule"></div>
+    </div>
+    <div id="faseRows"></div>
+  </section>
+
+  <!-- ===================== VISÃO POR EIXO ===================== -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2>Visão por eixo</h2>
+      <div class="rule"></div>
+    </div>
+    <div id="eixoRows"></div>
+  </section>
+
+  <!-- ===================== PENDÊNCIAS ===================== -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2 id="ledgerTitle">Entregáveis pendentes — ordenados por prazo</h2>
+      <div class="rule"></div>
+    </div>
+    <div class="pill-group small" id="statusFilter">
+      <button class="pill active" data-status="pendentes">Pendentes</button>
+      <button class="pill" data-status="todos">Todos os entregáveis</button>
+    </div>
+    <div class="ledger">
+      <div class="ledger-head">
+        <div>Prazo</div>
+        <div>Entregável</div>
+        <div style="text-align:right">Valor</div>
+        <div style="text-align:right">Situação</div>
+      </div>
+      <div id="pendRows"></div>
+    </div>
+  </section>
+
+  <!-- ===================== ANÁLISES ===================== -->
+  <section>
+    <div class="section-head">
+      <span class="section-num">05</span>
+      <h2>Análises</h2>
+      <div class="rule"></div>
+    </div>
+    <div class="analysis-grid" id="analysisGrid"></div>
+  </section>
+
+  <footer>
+    <b>Atualização de prazos — 15ª e 18ª parcelas</b> — Conforme e-mail de 06/07/2026 (Amarílis Lage, IDG), há proposta de adiamento para <b>30/10/2026</b> (15ª) e <b>30/11/2026</b> (18ª), motivada pela ampliação de escopo desses produtos (inclusão de equipamentos e tecnologia, além de mobiliário, conforme ata de 03/02/2026). A SEDUC (Cristiano Goldschmidt) ainda não confirmou essas datas nesta thread — por isso aparecem como <b>"proposta · aguardando SEDUC"</b>, com o histórico completo de datas visível em cada item.<br>
+    <b>Ressalva de dados</b> — As datas de prazo das 16ª e 17ª parcelas do 4º Aditivo constam na planilha de origem como texto com asterisco, associadas a notas de rodapé que indicam renegociação de datas entre SEDUC e IDG ainda sem confirmação oficial por e-mail. Neste painel elas aparecem sinalizadas como <b>"a confirmar"</b> e não entram na ordenação cronológica dos demais itens.<br>
+    <b>Outras inconsistências identificadas na planilha de origem</b> — data de emissão de NF do item "Análise de Contexto Político-Econômico" (Eixo Gestão) grafada como 22/04/0205, provável erro de digitação; data de NF do item "Pesquisa de Mercado" registrada como texto "Confirmando dado" em vez de data.
+  </footer>
+
+</div>
+
+<script>
+const DATA = {"eixos": {"Eixo Museológico": [{"item": 1, "desc": "Plano de Trabalho", "prazo": "2025-01-15", "valor": 150000, "status_entrega": "Entregue no prazo", "pago": true}, {"item": 2, "desc": "Concepção Estratégica", "prazo": "2025-03-16", "valor": 100000, "status_entrega": "Entregue no prazo", "pago": true}, {"item": 3, "desc": "Mapeamento de Repertório", "prazo": "2025-05-15", "valor": 250000, "status_entrega": "Entregue em 25/02/2026", "pago": true}, {"item": 4, "desc": "Plano Museológico", "prazo": "2025-09-02", "valor": 300000, "status_entrega": "Entregue em 19/02/2026", "pago": true}, {"item": 5, "desc": "Projeto Educativo", "prazo": "2025-09-12", "valor": 150000, "status_entrega": "Entregue em 19/02/2026", "pago": true}, {"item": 6, "desc": "Projeto de Acessibilidade", "prazo": "2025-09-12", "valor": 250000, "status_entrega": "Entregue em 19/02/2026", "pago": true}, {"item": 7, "desc": "Entregas Físicas de Acessibilidade", "prazo": "2025-09-12", "valor": 360000, "status_entrega": "Não entregue — condicionado à execução física das obras e instalação dos elementos estruturais de suporte", "pago": false}, {"item": 8, "desc": "Relatório Final", "prazo": "2025-09-12", "valor": 20000, "status_entrega": "Não entregue — dependente da consolidação de todas as etapas físicas e documentais precedentes", "pago": false}], "Eixo Gestão e Governança": [{"item": 1, "desc": "Análise de Contexto Político-Econômico", "prazo": "2025-02-14", "valor": 200000, "status_entrega": "Entregue no prazo", "pago": true}, {"item": 2, "desc": "Pesquisa de Mercado", "prazo": "2025-04-15", "valor": 150000, "status_entrega": "Entregue no prazo", "pago": true}, {"item": 3, "desc": "Plano de Gestão e Governança do Museu", "prazo": "2025-06-14", "valor": 250000, "status_entrega": "Entregue em 08/04/2026", "pago": true}, {"item": 4, "desc": "Programa de Capacitação de Equipe", "prazo": "2025-09-02", "valor": 150000, "status_entrega": "Entregue em 25/02/2026", "pago": true}, {"item": 5, "desc": "Estratégia e Plano Detalhado de Marca e Comunicação", "prazo": "2025-09-12", "valor": 200000, "status_entrega": "Entregue em 19/02/2026", "pago": true}, {"item": 6, "desc": "Relatório Final", "prazo": "2025-09-12", "valor": 20000, "status_entrega": "Entregue em 08/04/2026", "pago": true}], "4º Aditivo de Contrato": [{"item": "15ª Parcela", "desc": "Projeto básico do mobiliário para áreas do Receptivo e do Administrativo", "prazo": null, "valor": 30000, "status_entrega": "Não entregue", "pago": false, "negociacao": true, "prazo_datas": [{"label": "Original SEDUC (cronograma inicial)", "data": "2026-08-11"}, {"label": "Indicado na planilha (SIGOEI)", "data": "2026-10-14"}, {"label": "Proposta IDG em 06/07/2026 — aguardando aceite SEDUC", "data": "2026-10-30"}], "nota_escopo": "E-mail de 06/07/2026 (IDG): adiamento solicitado por ampliação de escopo (inclusão de equipamentos e tecnologia, além de mobiliário, conforme ata de 03/02/2026). Aguardando retorno formal da SEDUC sobre o prazo."}, {"item": "16ª Parcela", "desc": "Vídeo Institucional de Divulgação do Projeto", "prazo": null, "prazo_incerto": "30/09/2026 (indicado)  ·  originalmente 31/07/2026 pela SEDUC, IDG sugeriu 31/08/2026", "valor": 30000, "status_entrega": "Não entregue", "pago": false}, {"item": "17ª Parcela", "desc": "Assessoria técnica do Plano de Gestão — Desenho de Governança e Modelo de Gestão", "prazo": null, "prazo_incerto": "31/08/2026 (indicado)  ·  originalmente 30/06/2026, IDG sugeriu 30/09/2026", "valor": 85000, "status_entrega": "Não entregue", "pago": false}, {"item": "18ª Parcela", "desc": "Projeto executivo do mobiliário para áreas do Receptivo e do Administrativo", "prazo": null, "valor": 45000, "status_entrega": "Não entregue", "pago": false, "negociacao": true, "prazo_datas": [{"label": "Registrado anteriormente (SIGOEI)", "data": "2026-10-30"}, {"label": "Proposta IDG em 06/07/2026 — aguardando aceite SEDUC", "data": "2026-11-30"}], "nota_escopo": "E-mail de 06/07/2026 (IDG): adiamento solicitado por ampliação de escopo (inclusão de equipamentos e tecnologia, além de mobiliário, conforme ata de 03/02/2026). Aguardando retorno formal da SEDUC sobre o prazo."}, {"item": "19ª Parcela", "desc": "Projeto educativo da exposição temporária", "prazo": "2026-11-11", "valor": 180000, "status_entrega": "Não entregue", "pago": false}, {"item": "20ª Parcela", "desc": "Assessoria técnica do Plano de Gestão — Modelagem de Gestão de Governança e Operação do Museu", "prazo": "2026-11-30", "valor": 85000, "status_entrega": "Não entregue", "pago": false}, {"item": "21ª Parcela", "desc": "Assessoria técnica do Plano de Gestão — Apoio técnico na implementação do Plano de Comunicação", "prazo": "2027-04-30", "valor": 85000, "status_entrega": "Não entregue", "pago": false}, {"item": "22ª Parcela", "desc": "Assessoria técnica do Plano de Gestão — Consolidação final da assessoria de implementação do Plano Museológico e do Plano de Gestão", "prazo": "2027-07-31", "valor": 85000, "status_entrega": "Não entregue", "pago": false}]}};
+
+const fmtBRL = (v) => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+const fmtBRLcents = (v) => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+const TODAY = new Date('2026-08-07T00:00:00');
+
+function parseDate(s){
+  if(!s) return null;
+  return new Date(s + 'T00:00:00');
+}
+function fmtDateBR(d){
+  if(!d) return '—';
+  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'});
+}
+function daysDiff(d){
+  return Math.round((d - TODAY) / (1000*60*60*24));
+}
+
+// ---------- flatten ----------
+const FASE_MAP = {
+  'Eixo Museológico': 'Fase 1',
+  'Eixo Gestão e Governança': 'Fase 1',
+  '4º Aditivo de Contrato': 'Fase 2',
+};
+const FASE_LABEL = {
+  'Fase 1': 'Concepção, planos e produtos base',
+  'Fase 2': '4º Aditivo — ocupação, mobiliário e consolidação',
+};
+
+let allItems = [];
+Object.entries(DATA.eixos).forEach(([eixo, items]) => {
+  items.forEach(it => allItems.push({...it, eixo, fase: FASE_MAP[eixo]}));
+});
+
+const totalGeral = allItems.reduce((s,i)=>s+i.valor,0);
+const totalPago = allItems.filter(i=>i.pago).reduce((s,i)=>s+i.valor,0);
+const totalPendente = totalGeral - totalPago;
+const pctPago = totalPago/totalGeral*100;
+
+document.getElementById('genDate').textContent = TODAY.toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'});
+document.getElementById('totalItensMeta').textContent = allItems.length;
+
+// ---------- estado dos filtros ----------
+let currentFase = 'all';       // 'all' | 'Fase 1' | 'Fase 2'
+let currentStatus = 'pendentes'; // 'pendentes' | 'todos'
+
+function scopedItems(fase){
+  return fase === 'all' ? allItems : allItems.filter(i => i.fase === fase);
+}
+
+// ---------- resumo executivo ----------
+function renderResumo(fase){
+  const items = scopedItems(fase);
+  const total = items.reduce((s,i)=>s+i.valor,0);
+  const pago = items.filter(i=>i.pago).reduce((s,i)=>s+i.valor,0);
+  const pend = total - pago;
+  const pct = total ? (pago/total*100) : 0;
+  const scopeLabel = fase === 'all' ? 'do projeto' : `— ${fase}`;
+
+  document.getElementById('statTotal').textContent = fmtBRL(total);
+  document.getElementById('statTotalSub').textContent = items.length + ' entregáveis ' + scopeLabel;
+  document.getElementById('statPago').textContent = fmtBRL(pago);
+  document.getElementById('statPagoSub').textContent = items.filter(i=>i.pago).length + ' entregas quitadas';
+  document.getElementById('statPendente').textContent = fmtBRL(pend);
+  document.getElementById('statPendenteSub').textContent = items.filter(i=>!i.pago).length + ' entregas em aberto';
+
+  renderSeal(pct);
+}
+
+// ---------- seal donut ----------
+function renderSeal(pct){
+  const svg = document.getElementById('sealSvg');
+  const cx=64, cy=64, r=52;
+  const circumference = 2*Math.PI*r;
+  const offset = circumference * (1 - pct/100);
+  svg.innerHTML = `
+    <circle cx="${cx}" cy="${cy}" r="${r+8}" fill="none" stroke="#2a323a" stroke-width="1" stroke-dasharray="1 5"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#242b32" stroke-width="9"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#4f9d8f" stroke-width="9"
+      stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
+      stroke-linecap="butt" transform="rotate(-90 ${cx} ${cy})"/>
+    <text x="${cx}" y="${cy-4}" text-anchor="middle" class="seal-pct" font-size="21" font-weight="600" fill="#e9e6df">${pct.toFixed(1)}%</text>
+    <text x="${cx}" y="${cy+14}" text-anchor="middle" class="seal-pct" font-size="9" fill="#5f6870" letter-spacing="1">PAGO</text>
+  `;
+}
+
+// ---------- visão por fase (sempre mostra as duas, destaca a selecionada) ----------
+function renderFaseRows(fase){
+  const container = document.getElementById('faseRows');
+  container.innerHTML = '';
+  const fases = ['Fase 1', 'Fase 2'];
+  fases.forEach(f => {
+    const items = allItems.filter(i => i.fase === f);
+    const total = items.reduce((s,i)=>s+i.valor,0);
+    const pago = items.filter(i=>i.pago).reduce((s,i)=>s+i.valor,0);
+    const pend = total - pago;
+    const pctP = total ? (pago/total*100) : 0;
+    const eixosDaFase = [...new Set(items.map(i=>i.eixo))];
+    const row = document.createElement('div');
+    let cls = 'fase-row';
+    if(fase !== 'all'){ cls += (f === fase) ? ' selected' : ' dimmed'; }
+    row.className = cls;
+    row.innerHTML = `
+      <div class="fase-name">
+        <span class="fase-tag">${f}</span>
+        <div>${FASE_LABEL[f]}</div>
+        <small>${eixosDaFase.join(' · ')}<br>${items.length} entregáveis · ${fmtBRL(total)}</small>
+      </div>
+      <div class="fase-track">
+        <div class="bar-fill" style="width:${pctP}%"></div>
+        <div class="bar-fill pending-fill" style="width:${100-pctP}%"></div>
+      </div>
+      <div class="fase-figures">
+        <span class="pct">${pctP.toFixed(1)}% pago</span><br>
+        <span class="p">pago ${fmtBRL(pago)}</span><br>
+        <span class="q">pendente ${fmtBRL(pend)}</span>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+// ---------- visão por eixo (filtrada pela fase selecionada) ----------
+function renderEixoRows(fase){
+  const container = document.getElementById('eixoRows');
+  container.innerHTML = '';
+  Object.entries(DATA.eixos).forEach(([eixo, items]) => {
+    if(fase !== 'all' && FASE_MAP[eixo] !== fase) return;
+    const total = items.reduce((s,i)=>s+i.valor,0);
+    const pago = items.filter(i=>i.pago).reduce((s,i)=>s+i.valor,0);
+    const pend = total - pago;
+    const pctP = total ? (pago/total*100) : 0;
+    const row = document.createElement('div');
+    row.className = 'eixo-row';
+    row.innerHTML = `
+      <div class="eixo-name">${eixo}<small>${items.length} entregáveis · ${fmtBRL(total)}</small></div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${pctP}%"></div>
+        <div class="bar-fill pending-fill" style="width:${100-pctP}%"></div>
+      </div>
+      <div class="eixo-figures">
+        <span class="p">pago ${fmtBRL(pago)}</span><br>
+        <span class="q">pendente ${fmtBRL(pend)}</span>
+      </div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+// ---------- lista de entregáveis (filtrada por fase + status) ----------
+function renderLedger(fase, status){
+  const container = document.getElementById('pendRows');
+  container.innerHTML = '';
+
+  const title = document.getElementById('ledgerTitle');
+  const faseTxt = fase === 'all' ? '' : ` — ${fase}`;
+  title.textContent = (status === 'pendentes' ? 'Entregáveis pendentes' : 'Todos os entregáveis') + ' — ordenados por prazo' + faseTxt;
+
+  let scope = scopedItems(fase);
+  if(status === 'pendentes'){ scope = scope.filter(i => !i.pago); }
+
+  const pagos = scope.filter(i => i.pago)
+    .map(i => ({...i, _d: parseDate(i.prazo)}))
+    .sort((a,b) => (a._d||0) - (b._d||0));
+  const emNegociacao = scope.filter(i => !i.pago && i.negociacao);
+  const comDataIncerta = scope.filter(i => !i.pago && i.prazo_incerto && !i.negociacao);
+  const comData = scope.filter(i => !i.pago && i.prazo && !i.prazo_incerto && !i.negociacao)
+    .map(i => ({...i, _d: parseDate(i.prazo)}))
+    .sort((a,b) => a._d - b._d);
+
+  function renderRow(it, tagHtml, prazoHtml, extraHtml){
+    const div = document.createElement('div');
+    div.className = 'ledger-row';
+    div.innerHTML = `
+      <div class="ledger-prazo">${prazoHtml}${extraHtml || ''}</div>
+      <div class="ledger-desc">${it.desc}<span class="eixo-tiny">${it.fase} · ${it.eixo} · item ${it.item}</span>${it.status_entrega ? `<span class="note">${it.status_entrega}</span>` : ''}${it.nota_escopo ? `<span class="note">${it.nota_escopo}</span>` : ''}</div>
+      <div class="ledger-valor" style="color:${it.pago ? 'var(--paid)' : 'var(--pending)'}">${fmtBRL(it.valor)}</div>
+      <div style="text-align:right">${tagHtml}</div>
+    `;
+    container.appendChild(div);
+  }
+
+  // 1) itens em negociação ativa — histórico de datas propostas
+  emNegociacao.forEach(it => {
+    const hist = it.prazo_datas.map((p, idx) => {
+      const isLast = idx === it.prazo_datas.length - 1;
+      return `<div class="prazo-hist-row ${isLast ? 'current' : ''}"><span class="d">${fmtDateBR(parseDate(p.data))}</span> — ${p.label}</div>`;
+    }).join('');
+    renderRow(it,
+      `<span class="ledger-tag tag-negociacao">proposta · aguardando SEDUC</span>`,
+      `<span style="color:#ce9d4f">${fmtDateBR(parseDate(it.prazo_datas[it.prazo_datas.length-1].data))}</span>`,
+      `<div class="prazo-hist">${hist}</div>`
+    );
+  });
+
+  // 2) datas incertas sem proposta ativa (a confirmar)
+  comDataIncerta.forEach(it => {
+    renderRow(it,
+      `<span class="ledger-tag tag-unclear">a confirmar</span>`,
+      `<span style="color:#6f8ba6">indicado</span><span class="days" style="color:#5f6870">${it.prazo_incerto}</span>`
+    );
+  });
+
+  // 3) datas concretas pendentes, ordenadas
+  comData.forEach(it => {
+    const dd = daysDiff(it._d);
+    let tag;
+    if(dd < 0){
+      tag = `<span class="ledger-tag tag-overdue">atrasado ${Math.abs(dd)}d</span>`;
+    } else if(dd <= 45){
+      tag = `<span class="ledger-tag tag-soon">em ${dd}d</span>`;
+    } else {
+      tag = `<span class="ledger-tag tag-normal">em ${dd}d</span>`;
+    }
+    renderRow(it, tag, `${fmtDateBR(it._d)}`);
+  });
+
+  // 4) já pagos (só aparece em "todos") — ao final, ordenados por prazo
+  pagos.forEach(it => {
+    renderRow(it, `<span class="ledger-tag tag-paid">pago</span>`, `${fmtDateBR(it._d)}`);
+  });
+
+  if(scope.length === 0){
+    container.innerHTML = `<div class="ledger-row"><div class="ledger-desc" style="color:var(--text-dim)">Nenhum entregável nesta seleção.</div></div>`;
+  }
+}
+
+// ---------- análises (visão geral, não filtrada) ----------
+function renderAnalysis(){
+  const container = document.getElementById('analysisGrid');
+  container.innerHTML = '';
+
+  const pendentes = allItems.filter(i=>!i.pago);
+  const aditivo = DATA.eixos['4º Aditivo de Contrato'];
+  const totalAditivo = aditivo.reduce((s,i)=>s+i.valor,0);
+  const museo = DATA.eixos['Eixo Museológico'];
+  const museoPendFisico = museo.filter(i=>!i.pago).reduce((s,i)=>s+i.valor,0);
+  const maiorPendente = [...pendentes].sort((a,b)=>b.valor-a.valor)[0];
+  const overdue = pendentes.filter(i=>i.prazo && (parseDate(i.prazo) - TODAY) < 0);
+  const overdueTotal = overdue.reduce((s,i)=>s+i.valor,0);
+
+  const cards = [
+    {
+      label: 'risco', cls:'risk',
+      title: 'Pendência ligada a obras físicas, fora do controle direto do projeto',
+      body: `<span class="figure">${fmtBRL(museoPendFisico)}</span> do Eixo Museológico está pendente e depende da execução física das obras de acessibilidade — condição que não depende apenas da equipe de consultoria, mas de cronograma de obra civil. Isso inclui as duas entregas já formalmente com prazo vencido (${fmtBRL(overdueTotal)} em atraso desde 12/09/2025).`
+    },
+    {
+      label: 'atenção', cls:'watch',
+      title: 'Duas frentes distintas de prazo indefinido no 4º Aditivo',
+      body: `<span class="figure">15ª e 18ª parcelas</span> (${fmtBRL(75000)}) têm proposta concreta de adiamento por e-mail (06/07/2026) — aguardando apenas confirmação formal da SEDUC. Já <span class="figure">16ª e 17ª parcelas</span> (${fmtBRL(115000)}) seguem sem qualquer retorno nesta rodada; a data original da SEDUC para a 17ª — 30/06/2026 — já teria vencido, e mesmo a versão revisada (31/08/2026) está a poucas semanas. Vale cobrar posição sobre essas duas junto com a resposta pendente das outras.`
+    },
+    {
+      label: 'concentração', cls:'info',
+      title: 'Um único entregável concentra 18% do valor pendente',
+      body: `A <span class="figure">19ª Parcela</span> (Projeto educativo da exposição temporária, ${fmtBRL(maiorPendente.valor)}) é isoladamente a maior pendência em valor — ${(maiorPendente.valor/totalPendente*100).toFixed(1)}% do total pendente. O 4º Aditivo como um todo (${fmtBRL(totalAditivo)}) está 100% pendente, o que é esperado por ser a frente contratual mais recente.`
+    },
+    {
+      label: 'estabilidade', cls:'ok',
+      title: 'Eixo de Gestão e Governança está com pagamentos em dia',
+      body: `Todos os 6 entregáveis do Eixo Gestão e Governança já foram entregues e pagos (${fmtBRL(970000)}), incluindo os produtos estruturantes de governança, marca e capacitação. É o único eixo com execução financeira de 100%, e serve de referência de ritmo para os demais.`
+    }
+  ];
+
+  cards.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'analysis-card';
+    div.innerHTML = `<div class="a-label ${c.cls}">${c.label}</div><h3>${c.title}</h3><p>${c.body}</p>`;
+    container.appendChild(div);
+  });
+}
+
+// ---------- render inicial ----------
+function renderAll(){
+  renderResumo(currentFase);
+  renderFaseRows(currentFase);
+  renderEixoRows(currentFase);
+  renderLedger(currentFase, currentStatus);
+}
+renderAll();
+renderAnalysis();
+
+// ---------- wiring dos filtros ----------
+document.getElementById('faseFilter').addEventListener('click', (e) => {
+  const btn = e.target.closest('.pill');
+  if(!btn) return;
+  currentFase = btn.dataset.fase;
+  document.querySelectorAll('#faseFilter .pill').forEach(p => p.classList.toggle('active', p === btn));
+  renderAll();
+});
+
+document.getElementById('statusFilter').addEventListener('click', (e) => {
+  const btn = e.target.closest('.pill');
+  if(!btn) return;
+  currentStatus = btn.dataset.status;
+  document.querySelectorAll('#statusFilter .pill').forEach(p => p.classList.toggle('active', p === btn));
+  renderLedger(currentFase, currentStatus);
+});
+</script>
+</body>
+</html>
