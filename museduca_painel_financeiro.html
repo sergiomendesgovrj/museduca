@@ -6,22 +6,22 @@
 <title>MUSEDUCA — Painel Financeiro</title>
 <style>
   :root{
-    --bg: #14181c;
-    --bg-panel: #191e23;
-    --bg-raised: #1f252b;
-    --bg-raised-2: #242b32;
-    --border: #2a323a;
-    --border-soft: #232a30;
-    --text: #e9e6df;
-    --text-muted: #97a0a8;
-    --text-dim: #5f6870;
-    --paid: #4f9d8f;
-    --paid-soft: rgba(79,157,143,0.14);
-    --pending: #ce9d4f;
-    --pending-soft: rgba(206,157,79,0.14);
-    --danger: #bd5f4c;
-    --danger-soft: rgba(189,95,76,0.15);
-    --info: #6f8ba6;
+    --bg: #45494f;
+    --bg-panel: #4d525a;
+    --bg-raised: #565b64;
+    --bg-raised-2: #61666f;
+    --border: #6c7178;
+    --border-soft: #5c616a;
+    --text: #ffffff;
+    --text-muted: #d3d6da;
+    --text-dim: #a3a8ae;
+    --paid: #e0b93a;
+    --paid-soft: rgba(224,185,58,0.22);
+    --pending: #f0a04b;
+    --pending-soft: rgba(240,160,75,0.2);
+    --danger: #d9635a;
+    --danger-soft: rgba(217,99,90,0.22);
+    --info: #cfd6a8;
     --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
     --mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
     --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
@@ -39,8 +39,8 @@
 
   body{
     background-image:
-      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(111,139,166,0.06), transparent),
-      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(206,157,79,0.05), transparent);
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(224,185,58,0.10), transparent),
+      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(240,160,75,0.05), transparent);
     background-attachment: fixed;
   }
 
@@ -299,7 +299,7 @@
   }
   .ledger-head{
     display:grid;
-    grid-template-columns: 108px 1fr 140px 120px;
+    grid-template-columns: 108px 130px 1fr 34px;
     gap: 14px;
     padding: 10px 18px;
     background: var(--bg-raised);
@@ -310,22 +310,27 @@
     color: var(--text-dim);
     border-bottom: 1px solid var(--border);
   }
-  @media (max-width: 760px){
-    .ledger-head{ display:none; }
+  @media (max-width: 620px){
+    .ledger-head{ grid-template-columns: 84px 96px 1fr 30px; gap: 8px; padding: 10px 12px; }
   }
-  .ledger-row{
-    display:grid;
-    grid-template-columns: 108px 1fr 140px 120px;
-    gap: 14px;
-    padding: 16px 18px;
+  .ledger-item{
     border-bottom: 1px solid var(--border-soft);
-    align-items: start;
     background: var(--bg-panel);
   }
-  .ledger-row:last-child{ border-bottom: none; }
-  @media (max-width: 760px){
-    .ledger-row{ grid-template-columns: 1fr; gap: 6px; }
+  .ledger-item:last-child{ border-bottom: none; }
+
+  .ledger-summary{
+    display:grid;
+    grid-template-columns: 108px 130px 1fr 34px;
+    gap: 14px;
+    padding: 15px 18px;
+    align-items: center;
+    cursor: pointer;
   }
+  @media (max-width: 620px){
+    .ledger-summary{ grid-template-columns: 84px 96px 1fr 30px; gap: 8px; padding: 13px 12px; }
+  }
+
   .ledger-tag{
     font-family: var(--mono);
     font-size: 10.5px;
@@ -336,15 +341,35 @@
     white-space: nowrap;
     height: fit-content;
   }
-  .tag-overdue{ background: var(--danger-soft); color: var(--danger); border: 1px solid rgba(189,95,76,0.35); }
-  .tag-soon{ background: var(--pending-soft); color: var(--pending); border: 1px solid rgba(206,157,79,0.35); }
-  .tag-normal{ background: rgba(255,255,255,0.04); color: var(--text-muted); border: 1px solid var(--border-soft); }
-  .tag-unclear{ background: rgba(111,139,166,0.12); color: var(--info); border: 1px solid rgba(111,139,166,0.32); }
-  .tag-negociacao{ background: var(--pending-soft); color: var(--pending); border: 1px solid rgba(206,157,79,0.4); }
-  .tag-paid{ background: var(--paid-soft); color: var(--paid); border: 1px solid rgba(79,157,143,0.4); }
+  .tag-overdue{ background: var(--danger-soft); color: var(--danger); border: 1px solid rgba(217,99,90,0.5); }
+  .tag-soon{ background: var(--pending-soft); color: var(--pending); border: 1px solid rgba(240,160,75,0.5); }
+  .tag-normal{ background: rgba(255,255,255,0.08); color: var(--text-muted); border: 1px solid var(--border-soft); }
+  .tag-unclear{ background: rgba(207,214,168,0.16); color: var(--info); border: 1px solid rgba(207,214,168,0.4); }
+  .tag-negociacao{ background: var(--pending-soft); color: var(--pending); border: 1px solid rgba(240,160,75,0.55); }
+  .tag-paid{ background: var(--paid-soft); color: var(--paid); border: 1px solid rgba(224,185,58,0.5); }
+
+  .ledger-toggle{
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: rgba(217,122,45,0.16);
+    border: 1px solid rgba(217,122,45,0.45);
+    color: #d97a2d;
+    font-family: var(--mono);
+    font-size: 15px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+    padding: 0;
+  }
+  .ledger-toggle:hover{ background: rgba(217,122,45,0.28); }
+  .ledger-toggle.open{ background: #d97a2d; color: #2a1c0f; border-color: #d97a2d; }
 
   .prazo-hist{
-    margin-top: 4px;
+    margin-top: 8px;
     padding-left: 10px;
     border-left: 2px solid var(--border-soft);
   }
@@ -356,41 +381,43 @@
   .prazo-hist-row.current{ color: var(--pending); }
   .prazo-hist-row .d{ font-family: var(--mono); }
 
-  .ledger-desc{ font-size: 13.5px; line-height: 1.5; }
-  .ledger-desc .eixo-tiny{
+  .ledger-details{
+    display: none;
+    padding: 0 18px 18px 18px;
+  }
+  .ledger-details.open{ display: block; }
+  @media (max-width: 620px){ .ledger-details{ padding: 0 12px 16px 12px; } }
+
+  .ledger-desc-full{ font-size: 13.5px; line-height: 1.55; color: var(--text); }
+  .ledger-desc-full .eixo-tiny{
     display:block;
     font-family: var(--mono);
     font-size: 10px;
     color: var(--text-dim);
-    margin-top: 5px;
+    margin-top: 7px;
     letter-spacing: 0.03em;
   }
-  .ledger-desc .note{
+  .ledger-desc-full .note{
     display:block;
     font-size: 11.5px;
     color: var(--text-dim);
-    margin-top: 5px;
+    margin-top: 7px;
     font-style: italic;
-    line-height: 1.4;
+    line-height: 1.45;
   }
   .ledger-prazo{
     font-family: var(--mono);
     font-size: 12.5px;
     color: var(--text-muted);
   }
-  .ledger-prazo .days{
-    display:block;
-    font-size: 10.5px;
-    margin-top: 3px;
-  }
+  @media (max-width: 620px){ .ledger-prazo{ font-size: 11px; } }
   .ledger-valor{
     font-family: var(--mono);
     font-size: 14px;
-    text-align: right;
     color: var(--pending);
     font-weight: 500;
   }
-  @media (max-width: 760px){ .ledger-valor{ text-align:left; } }
+  @media (max-width: 620px){ .ledger-valor{ font-size: 12px; } }
 
   /* ===== ANÁLISES ===== */
   .analysis-grid{
@@ -470,7 +497,7 @@
   .pill.active{
     background: var(--paid);
     border-color: var(--paid);
-    color: #0c1215;
+    color: #2a1c0f;
     font-weight: 700;
   }
   .pill-group.small .pill{ padding: 7px 16px; font-size: 11.5px; }
@@ -486,7 +513,6 @@
     <div>
       <div class="masthead-eyebrow">SEDUC · OEI · IDG — Controle de Entregas e Recebimentos</div>
       <h1>MUSEDUCA — Painel Financeiro</h1>
-      <p>Museu da Memória Educacional do Rio Grande do Sul · Instituto de Educação General Flores da Cunha, Porto Alegre.</p>
     </div>
     <div class="masthead-meta">
       GERADO EM <b id="genDate"></b><br>
@@ -571,10 +597,10 @@
     </div>
     <div class="ledger">
       <div class="ledger-head">
-        <div>Prazo</div>
-        <div>Entregável</div>
-        <div style="text-align:right">Valor</div>
-        <div style="text-align:right">Situação</div>
+        <div>Data</div>
+        <div>Valor</div>
+        <div>Situação</div>
+        <div></div>
       </div>
       <div id="pendRows"></div>
     </div>
@@ -676,13 +702,13 @@ function renderSeal(pct){
   const circumference = 2*Math.PI*r;
   const offset = circumference * (1 - pct/100);
   svg.innerHTML = `
-    <circle cx="${cx}" cy="${cy}" r="${r+8}" fill="none" stroke="#2a323a" stroke-width="1" stroke-dasharray="1 5"/>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#242b32" stroke-width="9"/>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#4f9d8f" stroke-width="9"
+    <circle cx="${cx}" cy="${cy}" r="${r+8}" fill="none" stroke="#6c7178" stroke-width="1" stroke-dasharray="1 5"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#61666f" stroke-width="9"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#e0b93a" stroke-width="9"
       stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
       stroke-linecap="butt" transform="rotate(-90 ${cx} ${cy})"/>
-    <text x="${cx}" y="${cy-4}" text-anchor="middle" class="seal-pct" font-size="21" font-weight="600" fill="#e9e6df">${pct.toFixed(1)}%</text>
-    <text x="${cx}" y="${cy+14}" text-anchor="middle" class="seal-pct" font-size="9" fill="#5f6870" letter-spacing="1">PAGO</text>
+    <text x="${cx}" y="${cy-4}" text-anchor="middle" class="seal-pct" font-size="21" font-weight="600" fill="#ffffff">${pct.toFixed(1)}%</text>
+    <text x="${cx}" y="${cy+14}" text-anchor="middle" class="seal-pct" font-size="9" fill="#a3a8ae" letter-spacing="1">PAGO</text>
   `;
 }
 
@@ -770,15 +796,30 @@ function renderLedger(fase, status){
     .map(i => ({...i, _d: parseDate(i.prazo)}))
     .sort((a,b) => a._d - b._d);
 
-  function renderRow(it, tagHtml, prazoHtml, extraHtml){
+  function renderRow(it, tagHtml, prazoHtml, detailsExtraHtml){
     const div = document.createElement('div');
-    div.className = 'ledger-row';
+    div.className = 'ledger-item';
     div.innerHTML = `
-      <div class="ledger-prazo">${prazoHtml}${extraHtml || ''}</div>
-      <div class="ledger-desc">${it.desc}<span class="eixo-tiny">${it.fase} · ${it.eixo} · item ${it.item}</span>${it.status_entrega ? `<span class="note">${it.status_entrega}</span>` : ''}${it.nota_escopo ? `<span class="note">${it.nota_escopo}</span>` : ''}</div>
-      <div class="ledger-valor" style="color:${it.pago ? 'var(--paid)' : 'var(--pending)'}">${fmtBRL(it.valor)}</div>
-      <div style="text-align:right">${tagHtml}</div>
+      <div class="ledger-summary">
+        <div class="ledger-prazo">${prazoHtml}</div>
+        <div class="ledger-valor" style="color:${it.pago ? 'var(--paid)' : 'var(--pending)'}">${fmtBRL(it.valor)}</div>
+        <div>${tagHtml}</div>
+        <button type="button" class="ledger-toggle" aria-label="Ver detalhes">+</button>
+      </div>
+      <div class="ledger-details">
+        <div class="ledger-desc-full">${it.desc}<span class="eixo-tiny">${it.fase} · ${it.eixo} · item ${it.item}</span>${it.status_entrega ? `<span class="note">${it.status_entrega}</span>` : ''}${it.nota_escopo ? `<span class="note">${it.nota_escopo}</span>` : ''}${detailsExtraHtml || ''}</div>
+      </div>
     `;
+    const btn = div.querySelector('.ledger-toggle');
+    const details = div.querySelector('.ledger-details');
+    const summary = div.querySelector('.ledger-summary');
+    function toggle(){
+      const isOpen = details.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      btn.textContent = isOpen ? '–' : '+';
+    }
+    btn.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
+    summary.addEventListener('click', toggle);
     container.appendChild(div);
   }
 
@@ -789,8 +830,8 @@ function renderLedger(fase, status){
       return `<div class="prazo-hist-row ${isLast ? 'current' : ''}"><span class="d">${fmtDateBR(parseDate(p.data))}</span> — ${p.label}</div>`;
     }).join('');
     renderRow(it,
-      `<span class="ledger-tag tag-negociacao">proposta · aguardando SEDUC</span>`,
-      `<span style="color:#ce9d4f">${fmtDateBR(parseDate(it.prazo_datas[it.prazo_datas.length-1].data))}</span>`,
+      `<span class="ledger-tag tag-negociacao">proposta · SEDUC</span>`,
+      `<span style="color:#f0a04b">${fmtDateBR(parseDate(it.prazo_datas[it.prazo_datas.length-1].data))}</span>`,
       `<div class="prazo-hist">${hist}</div>`
     );
   });
@@ -799,7 +840,8 @@ function renderLedger(fase, status){
   comDataIncerta.forEach(it => {
     renderRow(it,
       `<span class="ledger-tag tag-unclear">a confirmar</span>`,
-      `<span style="color:#6f8ba6">indicado</span><span class="days" style="color:#5f6870">${it.prazo_incerto}</span>`
+      `<span style="color:#cfd6a8">a confirmar</span>`,
+      `<div class="note" style="margin-top:8px">Prazo indicado na planilha: ${it.prazo_incerto}</div>`
     );
   });
 
@@ -823,7 +865,7 @@ function renderLedger(fase, status){
   });
 
   if(scope.length === 0){
-    container.innerHTML = `<div class="ledger-row"><div class="ledger-desc" style="color:var(--text-dim)">Nenhum entregável nesta seleção.</div></div>`;
+    container.innerHTML = `<div class="ledger-item"><div class="ledger-summary" style="cursor:default"><div style="color:var(--text-dim); grid-column: 1 / -1;">Nenhum entregável nesta seleção.</div></div></div>`;
   }
 }
 
