@@ -946,8 +946,8 @@ function renderAnalysis(){
     },
     {
       label: 'concentração', cls:'info',
-      title: 'Um único entregável concentra 18% do valor pendente',
-      body: `A <span class="figure">19ª Parcela</span> (Projeto educativo da exposição temporária, ${fmtBRL(maiorPendente.valor)}) é isoladamente a maior pendência em valor — ${(maiorPendente.valor/totalPendente*100).toFixed(1)}% do total pendente. O 4º Aditivo como um todo (${fmtBRL(totalAditivo)}) está 100% pendente, o que é esperado por ser a frente contratual mais recente.`
+      title: `Um único entregável concentra ${(maiorPendente.valor/totalPendente*100).toFixed(1)}% do valor pendente`,
+      body: `<span class="figure">${maiorPendente.desc}</span> (${maiorPendente.eixo}, ${fmtBRL(maiorPendente.valor)}) é isoladamente a maior pendência em valor — ${(maiorPendente.valor/totalPendente*100).toFixed(1)}% do total pendente. O 4º Aditivo como um todo (${fmtBRL(totalAditivo)}) está 100% pendente, o que é esperado por ser a frente contratual mais recente.`
     },
     {
       label: 'estabilidade', cls:'ok',
