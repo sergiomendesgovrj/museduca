@@ -1,1044 +1,1338 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MUSEDUCA — Painel Financeiro</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel Financeiro Museduca — Etapa 1, Etapa 2 e Consolidado</title>
 <style>
-  :root{
-    --bg: #45494f;
-    --bg-panel: #4d525a;
-    --bg-raised: #565b64;
-    --bg-raised-2: #61666f;
-    --border: #6c7178;
-    --border-soft: #5c616a;
-    --text: #ffffff;
-    --text-muted: #d3d6da;
-    --text-dim: #a3a8ae;
-    --paid: #e0b93a;
-    --paid-soft: rgba(224,185,58,0.22);
-    --pending: #f0a04b;
-    --pending-soft: rgba(240,160,75,0.2);
-    --danger: #d9635a;
-    --danger-soft: rgba(217,99,90,0.22);
-    --info: #cfd6a8;
-    --status-paid: #6fa8dc;
-    --status-ontime: #7dc383;
-    --status-overdue: #e0645c;
-    --status-review: #e0b93a;
-    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
-    --mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
-    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+:root{
+  color-scheme: light;
+  --page:#f9f9f7; --surface:#fcfcfb;
+  --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,0.10);
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4;
+  --good:#0ca30c; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --goodtext:#006300;
+  --radius:14px;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    color-scheme: dark;
+    --page:#0d0d0d; --surface:#1a1a19;
+    --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181;
+    --goodtext:#0ca30c;
   }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --page:#0d0d0d; --surface:#1a1a19;
+  --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,0.10);
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181;
+  --goodtext:#0ca30c;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--sans);line-height:1.55;
+  font-size:15px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 72px}
 
-  *{ box-sizing: border-box; }
+header.top{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;justify-content:space-between;
+  padding-bottom:20px;border-bottom:1px solid var(--border);margin-bottom:26px}
+.eyebrow{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 6px}
+h1{font-size:clamp(22px,3.2vw,31px);line-height:1.2;margin:0;font-weight:650;letter-spacing:-.01em}
+.sub{color:var(--ink2);font-size:14px;margin:8px 0 0;max-width:64ch}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+button.tool{font:inherit;font-size:13px;padding:7px 13px;border-radius:999px;border:1px solid var(--border);
+  background:var(--surface);color:var(--ink2);cursor:pointer}
+button.tool:hover{color:var(--ink);border-color:var(--axis)}
 
-  html,body{
-    margin:0; padding:0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    -webkit-font-smoothing: antialiased;
-  }
+nav.jump{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+nav.jump a{font-size:12.5px;text-decoration:none;color:var(--ink2);background:var(--surface);
+  border:1px solid var(--border);border-radius:999px;padding:6px 14px}
+nav.jump a:hover{color:var(--ink);border-color:var(--axis)}
+nav.jump a .n{color:var(--muted);font-weight:650;margin-right:6px}
 
-  body{
-    background-image:
-      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(224,185,58,0.10), transparent),
-      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(240,160,75,0.05), transparent);
-    background-attachment: fixed;
-  }
+.hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:26px 28px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end;justify-content:space-between}
+.hero .label{font-size:13px;color:var(--ink2);margin:0 0 6px}
+.hero .value{font-size:clamp(36px,5.6vw,54px);font-weight:660;letter-spacing:-.02em;line-height:1;margin:0}
+.hero .note{font-size:13px;color:var(--muted);margin:10px 0 0;max-width:56ch}
+.hero .split{display:flex;gap:26px;flex-wrap:wrap}
+.hero .mini .m-label{font-size:12px;color:var(--muted);margin:0 0 3px}
+.hero .mini .m-val{font-size:19px;font-weight:620;margin:0;letter-spacing:-.01em;white-space:nowrap}
 
-  .wrap{
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 48px 28px 100px;
-  }
+.tiles{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:16px}
+@media (min-width:560px){.tiles{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:900px){.tiles{grid-template-columns:repeat(3,1fr)}}
+.tiles.four{grid-template-columns:1fr}
+@media (min-width:560px){.tiles.four{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:980px){.tiles.four{grid-template-columns:repeat(4,1fr)}}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+.tile .t-label{font-size:12.5px;color:var(--ink2);margin:0 0 8px;min-height:2.6em}
+.tile .t-val{font-size:25px;font-weight:640;letter-spacing:-.015em;margin:0;line-height:1.1;white-space:nowrap}
+.tile .t-note{font-size:11.5px;color:var(--muted);margin:8px 0 0;line-height:1.45}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 8px;
+  border-radius:999px;border:1px solid var(--border);color:var(--ink2);margin-top:9px}
+.chip .dot{width:7px;height:7px;border-radius:50%;flex:none}
 
-  /* ===== HEADER ===== */
-  .masthead{
-    display:flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 24px;
-    padding-bottom: 22px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 40px;
-    flex-wrap: wrap;
-  }
-  .masthead-eyebrow{
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 10px;
-  }
-  .masthead h1{
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: 34px;
-    letter-spacing: 0.01em;
-    margin: 0 0 8px;
-    color: var(--text);
-  }
-  .masthead p{
-    font-size: 14px;
-    color: var(--text-muted);
-    max-width: 560px;
-    line-height: 1.5;
-    margin: 0;
-  }
-  .masthead-meta{
-    text-align: right;
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: var(--text-dim);
-    line-height: 1.9;
-  }
-  .masthead-meta b{ color: var(--text-muted); font-weight: 500; }
+section{margin-bottom:38px;scroll-margin-top:16px}
+.sec-head{border-top:2px solid var(--ink);padding-top:14px;margin-bottom:18px}
+.sec-head .kicker{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  font-weight:700;margin:0 0 4px}
+h2{font-size:clamp(19px,2.6vw,24px);font-weight:650;margin:0;letter-spacing:-.015em}
+.section-sub{color:var(--ink2);font-size:13.5px;margin:8px 0 0;max-width:80ch}
+h3.sub-h{font-size:15px;font-weight:640;margin:26px 0 12px;letter-spacing:-.005em}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px 18px}
+.card + .card{margin-top:14px}
+.card-head{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between;margin-bottom:4px}
+.card h3{font-size:15.5px;font-weight:620;margin:0}
+.card .c-sub{font-size:12.5px;color:var(--muted);margin:2px 0 14px;max-width:80ch}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 12px;padding:0;list-style:none}
+.legend li{display:flex;align-items:center;gap:7px;font-size:12.5px}
+.legend li>span:last-child{color:var(--ink2)}
+.key{width:12px;height:12px;border-radius:3px;flex:none}
+.key.line{height:0;border-radius:0;border-top:2px solid currentColor;width:16px}
+.key.dash{height:0;border-radius:0;border-top:2px dashed currentColor;width:16px}
+.chart-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+.chart-scroll svg{max-width:none}
+.chart{position:relative}
+svg{display:block;max-width:100%}
+.scroll-hint{font-size:11.5px;color:var(--muted);margin:6px 0 0}
+.fnote{font-size:11.5px;color:var(--muted);margin:10px 0 0;line-height:1.5}
+@media (min-width:820px){.scroll-hint{display:none}}
 
-  section{ margin-bottom: 56px; }
-  .section-head{
-    display:flex;
-    align-items: baseline;
-    gap: 14px;
-    margin-bottom: 22px;
-  }
-  .section-num{
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--text-dim);
-    letter-spacing: 0.05em;
-  }
-  .section-head h2{
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: 20px;
-    margin: 0;
-    color: var(--text);
-  }
-  .section-head .rule{
-    flex: 1;
-    height: 1px;
-    background: var(--border-soft);
-  }
+.tip{position:absolute;pointer-events:none;opacity:0;transition:opacity .1s;background:var(--surface);
+  border:1px solid var(--axis);border-radius:9px;padding:9px 11px;font-size:12.5px;color:var(--ink);
+  box-shadow:0 6px 22px rgba(0,0,0,.13);min-width:160px;z-index:5}
+.tip .tt{font-weight:640;margin-bottom:5px;font-size:12px;color:var(--ink)}
+.tip .row{display:flex;align-items:center;gap:7px;justify-content:space-between}
+.tip .row .nm{display:flex;align-items:center;gap:6px;color:var(--ink2)}
+.tip .row .vl{font-variant-numeric:tabular-nums;font-weight:600}
+.tip .sep{height:1px;background:var(--border);margin:6px 0}
 
-  /* ===== RESUMO EXECUTIVO ===== */
-  .resumo-grid{
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 220px;
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-  }
-  @media (max-width: 900px){
-    .resumo-grid{ grid-template-columns: 1fr 1fr; }
-  }
-  .stat-card{
-    background: var(--bg-panel);
-    padding: 24px 22px;
-    display:flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 128px;
-  }
-  .stat-label{
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 14px;
-  }
-  .stat-value{
-    font-family: var(--mono);
-    font-size: 27px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-  }
-  .stat-value.paid{ color: var(--paid); }
-  .stat-value.pending{ color: var(--pending); }
-  .stat-sub{
-    font-size: 12px;
-    color: var(--text-dim);
-    margin-top: 6px;
-    font-family: var(--mono);
-  }
+.tbl-wrap{overflow-x:auto;margin-top:4px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--border);vertical-align:top}
+th{font-size:11px;letter-spacing:.055em;text-transform:uppercase;color:var(--muted);font-weight:650;white-space:nowrap}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr:hover{background:color-mix(in srgb, var(--ink) 3.5%, transparent)}
+tr.grp td{background:color-mix(in srgb, var(--ink) 4.5%, transparent);font-weight:620}
+tr.tot td{font-weight:660;border-top:1.5px solid var(--axis);border-bottom:none}
+.neg{color:var(--critical)}
+.pos{color:var(--goodtext)}
+.st{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;font-size:12px}
+.st .dot{width:8px;height:8px;border-radius:50%;flex:none}
+details.tv{margin-top:12px}
+details.tv summary{cursor:pointer;font-size:12.5px;color:var(--ink2);list-style:none;display:inline-flex;
+  align-items:center;gap:6px;padding:5px 11px;border:1px solid var(--border);border-radius:999px}
+details.tv summary::-webkit-details-marker{display:none}
+details.tv summary:hover{color:var(--ink);border-color:var(--axis)}
+details.tv[open] summary{margin-bottom:8px}
 
-  .seal-card{
-    background: var(--bg-panel);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    padding: 18px;
-  }
-  .seal-pct{
-    font-family: var(--mono);
-    font-size: 12px;
-    fill: var(--text);
-  }
-  .seal-caption{
-    font-family: var(--mono);
-    font-size: 9.5px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-top: 10px;
-    text-align: center;
-  }
-
-  /* ===== VISÃO POR FASE ===== */
-  .fase-row{
-    display: grid;
-    grid-template-columns: 240px 1fr 260px;
-    gap: 20px;
-    align-items: center;
-    padding: 22px 24px;
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-  }
-  .fase-row + .fase-row{ border-top: none; margin-top: -1px; }
-  @media (max-width: 760px){
-    .fase-row{ grid-template-columns: 1fr; gap: 10px; }
-  }
-  .fase-name{
-    font-family: var(--serif);
-    font-size: 18px;
-    color: var(--text);
-  }
-  .fase-name .fase-tag{
-    display: inline-block;
-    font-family: var(--mono);
-    font-size: 9.5px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    background: var(--bg-raised);
-    border: 1px solid var(--border-soft);
-    padding: 2px 7px;
-    border-radius: 2px;
-    margin-bottom: 8px;
-  }
-  .fase-name small{
-    display:block;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-dim);
-    margin-top: 6px;
-    letter-spacing: 0.02em;
-  }
-  .fase-track{
-    position: relative;
-    height: 26px;
-    background: var(--bg-raised);
-    border-radius: 2px;
-    overflow: hidden;
-    border: 1px solid var(--border-soft);
-  }
-  .fase-figures{
-    font-family: var(--mono);
-    font-size: 13px;
-    text-align: right;
-    color: var(--text-muted);
-    line-height: 1.75;
-  }
-  .fase-figures .p{ color: var(--paid); }
-  .fase-figures .q{ color: var(--pending); }
-  .fase-figures .pct{
-    font-size: 20px;
-    color: var(--text);
-    font-weight: 500;
-  }
-
-  /* ===== VISÃO POR EIXO ===== */
-  .eixo-row{
-    display: grid;
-    grid-template-columns: 240px 1fr 260px;
-    gap: 20px;
-    align-items: center;
-    padding: 18px 0;
-    border-bottom: 1px solid var(--border-soft);
-  }
-  .eixo-row:first-of-type{ border-top: 1px solid var(--border-soft); }
-  @media (max-width: 760px){
-    .eixo-row{ grid-template-columns: 1fr; gap: 10px; }
-  }
-  .eixo-name{
-    font-family: var(--serif);
-    font-size: 15.5px;
-    color: var(--text);
-  }
-  .eixo-name small{
-    display:block;
-    font-family: var(--mono);
-    font-size: 10.5px;
-    color: var(--text-dim);
-    margin-top: 4px;
-    letter-spacing: 0.03em;
-  }
-  .bar-track{
-    position: relative;
-    height: 22px;
-    background: var(--bg-raised);
-    border-radius: 2px;
-    overflow: hidden;
-    border: 1px solid var(--border-soft);
-  }
-  .bar-fill{ position:absolute; top:0; left:0; height:100%; background: var(--paid); }
-  .bar-fill.pending-fill{ background: var(--pending); left: auto; right: 0; }
-  .eixo-figures{
-    font-family: var(--mono);
-    font-size: 12px;
-    text-align: right;
-    color: var(--text-muted);
-    line-height: 1.7;
-  }
-  .eixo-figures .p{ color: var(--paid); }
-  .eixo-figures .q{ color: var(--pending); }
-
-  /* ===== PENDÊNCIAS ===== */
-  .ledger{
-    border: 1px solid var(--border);
-  }
-  .ledger-head{
-    display:grid;
-    grid-template-columns: 108px 130px 1fr 34px;
-    gap: 14px;
-    padding: 10px 18px;
-    background: var(--bg-raised);
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    border-bottom: 1px solid var(--border);
-  }
-  @media (max-width: 620px){
-    .ledger-head{ grid-template-columns: 84px 96px 1fr 30px; gap: 8px; padding: 10px 12px; }
-  }
-  .ledger-item{
-    border-bottom: 1px solid var(--border-soft);
-    background: var(--bg-panel);
-  }
-  .ledger-item:last-child{ border-bottom: none; }
-
-  .ledger-eixo-group{ border-bottom: 1px solid var(--border-soft); }
-  .ledger-eixo-group:last-child{ border-bottom: none; }
-
-  .ledger-eixo-header{
-    display:flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 18px;
-    padding: 16px 18px;
-    background: var(--bg-raised-2);
-    cursor: pointer;
-  }
-  .ledger-eixo-header .eixo-name{ flex: 1 1 220px; min-width: 180px; }
-  .ledger-eixo-header .bar-track{ flex: 2 1 200px; min-width: 140px; }
-  .ledger-eixo-header .eixo-figures{ flex: 0 0 auto; text-align: right; }
-  .ledger-eixo-header .ledger-toggle{ flex: 0 0 auto; }
-  @media (max-width: 620px){
-    .ledger-eixo-header{ padding: 13px 12px; gap: 10px; }
-    .ledger-eixo-header .eixo-figures{ text-align: left; }
-  }
-
-  .ledger-eixo-items{ display: none; }
-  .ledger-eixo-items.open{ display: block; }
-
-  .ledger-summary{
-    display:grid;
-    grid-template-columns: 108px 130px 1fr 34px;
-    gap: 14px;
-    padding: 15px 18px;
-    align-items: center;
-    cursor: pointer;
-  }
-  @media (max-width: 620px){
-    .ledger-summary{ grid-template-columns: 84px 96px 1fr 30px; gap: 8px; padding: 13px 12px; }
-  }
-
-  .ledger-tag{
-    font-family: var(--mono);
-    font-size: 10.5px;
-    padding: 3px 8px;
-    border-radius: 2px;
-    display: inline-block;
-    width: fit-content;
-    white-space: nowrap;
-    height: fit-content;
-  }
-  .tag-overdue{ background: var(--danger-soft); color: var(--danger); border: 1px solid rgba(217,99,90,0.5); }
-  .tag-soon{ background: var(--pending-soft); color: var(--pending); border: 1px solid rgba(240,160,75,0.5); }
-  .tag-normal{ background: rgba(255,255,255,0.08); color: var(--text-muted); border: 1px solid var(--border-soft); }
-  .tag-unclear{ background: rgba(207,214,168,0.16); color: var(--info); border: 1px solid rgba(207,214,168,0.4); }
-  .tag-negociacao{ background: var(--pending-soft); color: var(--pending); border: 1px solid rgba(240,160,75,0.55); }
-  .tag-paid{ background: var(--paid-soft); color: var(--paid); border: 1px solid rgba(224,185,58,0.5); }
-
-  .ledger-toggle{
-    width: 26px;
-    height: 26px;
-    border-radius: 6px;
-    background: rgba(217,122,45,0.16);
-    border: 1px solid rgba(217,122,45,0.45);
-    color: #d97a2d;
-    font-family: var(--mono);
-    font-size: 15px;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background .15s ease, color .15s ease;
-    padding: 0;
-  }
-  .ledger-toggle:hover{ background: rgba(217,122,45,0.28); }
-  .ledger-toggle.open{ background: #d97a2d; color: #2a1c0f; border-color: #d97a2d; }
-
-  .prazo-hist{
-    margin-top: 8px;
-    padding-left: 10px;
-    border-left: 2px solid var(--border-soft);
-  }
-  .prazo-hist-row{
-    font-size: 10.5px;
-    color: var(--text-dim);
-    line-height: 1.6;
-  }
-  .prazo-hist-row.current{ color: var(--pending); }
-  .prazo-hist-row .d{ font-family: var(--mono); }
-
-  .ledger-details{
-    display: none;
-    padding: 0 18px 18px 18px;
-  }
-  .ledger-details.open{ display: block; }
-  @media (max-width: 620px){ .ledger-details{ padding: 0 12px 16px 12px; } }
-
-  .ledger-desc-full{ font-size: 13.5px; line-height: 1.55; color: var(--text); }
-  .ledger-desc-full .eixo-tiny{
-    display:block;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text-dim);
-    margin-top: 7px;
-    letter-spacing: 0.03em;
-  }
-  .ledger-desc-full .note{
-    display:block;
-    font-size: 11.5px;
-    color: var(--text-dim);
-    margin-top: 7px;
-    font-style: italic;
-    line-height: 1.45;
-  }
-  .ledger-desc-full .ledger-tag-wrap{ display:block; margin-bottom: 8px; }
-  .ledger-prazo{
-    font-family: var(--mono);
-    font-size: 12.5px;
-    color: inherit;
-  }
-  @media (max-width: 620px){ .ledger-prazo{ font-size: 11px; } }
-  .ledger-desc-inline{
-    font-size: 13.5px;
-    line-height: 1.4;
-    color: inherit;
-  }
-  @media (max-width: 620px){ .ledger-desc-inline{ font-size: 12px; } }
-  .ledger-valor{
-    font-family: var(--mono);
-    font-size: 14px;
-    color: inherit;
-    font-weight: 600;
-  }
-  @media (max-width: 620px){ .ledger-valor{ font-size: 12px; } }
-
-  /* ===== ANÁLISES ===== */
-  .analysis-grid{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-  }
-  @media (max-width: 760px){
-    .analysis-grid{ grid-template-columns: 1fr; }
-  }
-  .analysis-card{
-    background: var(--bg-panel);
-    padding: 22px 24px;
-  }
-  .analysis-card .a-label{
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-  .a-label.risk{ color: var(--danger); }
-  .a-label.watch{ color: var(--pending); }
-  .a-label.info{ color: var(--info); }
-  .a-label.ok{ color: var(--paid); }
-  .analysis-card h3{
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: 16px;
-    margin: 0 0 10px;
-    color: var(--text);
-  }
-  .analysis-card p{
-    font-size: 13px;
-    line-height: 1.65;
-    color: var(--text-muted);
-    margin: 0;
-  }
-  .analysis-card p + p{ margin-top: 10px; }
-  .analysis-card .figure{
-    font-family: var(--mono);
-    color: var(--text);
-  }
-
-  footer{
-    border-top: 1px solid var(--border-soft);
-    padding-top: 22px;
-    font-family: var(--mono);
-    font-size: 10.5px;
-    color: var(--text-dim);
-    line-height: 1.8;
-  }
-  footer b{ color: var(--text-muted); }
-
-  /* ===== SEGMENTED PILL FILTER ===== */
-  .pill-group{
-    display:flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 26px;
-  }
-  .pill{
-    font-family: var(--mono);
-    font-size: 13px;
-    padding: 10px 22px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: background .15s ease, border-color .15s ease, color .15s ease;
-    line-height: 1.2;
-  }
-  .pill:hover{ border-color: var(--text-dim); color: var(--text); }
-  .pill.active{
-    background: var(--paid);
-    border-color: var(--paid);
-    color: #2a1c0f;
-    font-weight: 700;
-  }
-  .pill-group.small .pill{ padding: 7px 16px; font-size: 11.5px; }
-  .pill-group.small{ margin-bottom: 18px; }
-  .fase-row.dimmed{ opacity: 0.4; }
-  .fase-row.selected{ border-color: var(--paid); }
+.callout{border:1px solid var(--border);border-left:3px solid var(--s1);border-radius:10px;
+  padding:15px 18px;background:var(--surface);font-size:13.5px;color:var(--ink2)}
+.callout.warn{border-left-color:var(--warning)}
+.callout.att{border-left-color:var(--serious)}
+.callout.ok{border-left-color:var(--good)}
+.callout strong{color:var(--ink);font-weight:620}
+.callout .ct{display:flex;align-items:center;gap:8px;font-weight:640;color:var(--ink);margin-bottom:6px;font-size:13.5px}
+.callout ol,.callout ul{margin:8px 0 0;padding-left:20px}
+.callout li{margin-bottom:7px}
+.ico{width:16px;height:16px;flex:none}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+footer p{margin:0 0 6px}
+@media print{
+  body{background:#fff}
+  .tools,.scroll-hint,nav.jump{display:none}
+  .card,.tile,.hero{break-inside:avoid;border-color:#ccc}
+  details.tv{display:none}
+  section{break-before:auto}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <div class="masthead">
-    <div>
-      <div class="masthead-eyebrow">SEDUC · OEI · IDG — Controle de Entregas e Recebimentos</div>
-      <h1>MUSEDUCA — Painel Financeiro</h1>
+<header class="top">
+  <div>
+    <p class="eyebrow">IDG · Projeto Museduca</p>
+    <h1>Painel Financeiro Museduca</h1>
+    <p class="sub">Etapas 1 e 2 do contrato, fluxo de caixa 2025–2026 (realizado até jul/2026, projetado
+      ago–dez/2026) e perspectiva 2027. Posição apurada em <strong>13/08/2026</strong>.</p>
+  </div>
+  <div class="tools">
+    <button class="tool" id="themeBtn" type="button">Modo escuro</button>
+    <button class="tool" onclick="window.print()" type="button">Imprimir / PDF</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <p class="label">Saldo em caixa projetado para dezembro/2026</p>
+    <p class="value" id="heroVal">—</p>
+    <p class="note">Conta dedicada Museduca. Inclui o repasse de coordenação da etapa 2 e não inclui os
+      R$ 380.000 da etapa 1, cuja entrada só é prevista para dezembro/2027.</p>
+  </div>
+  <div class="split">
+    <div class="mini">
+      <p class="m-label">Recurso dedicado a 2027</p>
+      <p class="m-val" id="heroRes">—</p>
     </div>
-    <div class="masthead-meta">
-      GERADO EM <b id="genDate"></b><br>
-      FONTE · Planilha de Controle de Entrega e Recebimentos<br>
-      2 FASES · 3 EIXOS · <span id="totalItensMeta"></span> ENTREGÁVEIS
+    <div class="mini">
+      <p class="m-label">Saldo livre</p>
+      <p class="m-val" id="heroLivre">—</p>
+    </div>
+  </div>
+</div>
+
+<!-- LEITURA EXECUTIVA -->
+<section style="margin-bottom:26px">
+  <div class="callout">
+    <div class="ct">
+      <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <path d="M2.4 12.6V4.2a1.6 1.6 0 0 1 1.6-1.6h8a1.6 1.6 0 0 1 1.6 1.6v8.4"/>
+        <path d="M2.4 12.6a1.6 1.6 0 0 0 1.6 1.6h9.6"/><path d="M5.4 6.2h5.2M5.4 8.8h3.2"/></svg>
+      Leitura executiva
+    </div>
+    <ul>
+      <li><strong>A etapa 1 está praticamente concluída em execução financeira:</strong> 12 dos 14 produtos
+        entregues e pagos, R$ 2.170.000 de R$ 2.550.000 recebidos (85%). Descontada a coordenação, R$ 1.850.000
+        foram aplicados na execução do projeto.</li>
+      <li><strong>O que ainda pode entrar não muda o caixa do projeto.</strong> Os R$ 380.000 pendentes da etapa 1,
+        se recebidos ao final das entregas, seguem integralmente para a coordenação — assim como todo o valor da
+        etapa 2. Não há, portanto, risco de caixa associado a esse recebimento: ele entra e sai.</li>
+      <li><strong>A etapa 2 ainda não começou a girar:</strong> nenhuma das oito parcelas do 4º aditivo foi
+        entregue ou faturada, e a primeira delas já tinha prazo em ago/2026. O gargalo aqui é de execução das
+        entregas, não de caixa.</li>
+      <li><strong>Coordenação no ciclo 2025–2027: R$ 1.325.000.</strong> R$ 700.000 com origem na etapa 1
+        (R$ 130.000 já enviados, R$ 190.000 a enviar em 2026 e R$ 380.000 condicionados a 2027) e R$ 625.000 da
+        etapa 2.</li>
+      <li><strong>Dos R$ 551.602,75 projetados para dez/2026, R$ 500.000 já estão dedicados</strong> a ações das
+        fases 1 e 2 que ainda serão abertas no cronograma financeiro de 2027 — ou seja, são despesa projetada para
+        2027, não folga de caixa. Sobram <strong>R$ 51.602,75</strong> livres, que é também o saldo projetado ao
+        final de 2027.</li>
+    </ul>
+  </div>
+</section>
+
+<nav class="jump" aria-label="Seções do painel">
+  <a href="#etapa1"><span class="n">1</span>Etapa 1 — contrato original</a>
+  <a href="#etapa2"><span class="n">2</span>Etapa 2 — 4º aditivo</a>
+  <a href="#consolidado"><span class="n">3</span>Consolidado</a>
+  <a href="#anexos"><span class="n">4</span>Anexos</a>
+</nav>
+
+<!-- ============================ ETAPA 1 ============================ -->
+<section id="etapa1">
+  <div class="sec-head">
+    <p class="kicker">Etapa 1</p>
+    <h2>Contrato original — R$ 2.550.000</h2>
+    <p class="section-sub">Dois eixos de produtos: Museológico (R$ 1.580.000, 8 produtos) e Gestão &amp;
+      Governança (R$ 970.000, 6 produtos). É a etapa que sustentou o caixa do projeto até aqui.</p>
+  </div>
+
+  <div class="tiles four" id="tiles-f1"></div>
+
+  <div class="card">
+    <div class="card-head"><h3>Execução financeira dos dois eixos</h3></div>
+    <p class="c-sub">O eixo Gestão e Governança está integralmente entregue e pago. No eixo Museológico, o que
+      falta é contingente.</p>
+    <ul class="legend" id="l-f1"></ul>
+    <div class="chart" id="c-f1"></div>
+    <details class="tv"><summary>Ver dados em tabela</summary><div class="tbl-wrap" id="t-f1"></div></details>
+  </div>
+
+  <h3 class="sub-h">Produtos, prazos e recebimentos</h3>
+  <div class="card">
+    <div class="card-head"><h3>Eixo Museológico — 8 produtos</h3></div>
+    <p class="c-sub">Contratado R$ 1.580.000 · recebido R$ 1.200.000 · a receber R$ 380.000 (produtos 7 e 8).
+      Os produtos 3 a 6 foram entregues com atraso em relação ao prazo SIGOEI e pagos em abril/2026.</p>
+    <div class="tbl-wrap" id="t-museo"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>Eixo Gestão e Governança — 6 produtos</h3></div>
+    <p class="c-sub">Contratado R$ 970.000 · recebido R$ 970.000 · eixo encerrado, com o relatório final entregue
+      em 08/04/2026 e pago em 11/06/2026.</p>
+    <div class="tbl-wrap" id="t-gestao"></div>
+  </div>
+
+  <h3 class="sub-h">Destinação dos recursos da etapa 1</h3>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><h3>Coordenação — enviado, a enviar e condicionado</h3></div>
+      <p class="c-sub">Recursos da etapa 1 destinados à coordenação geral do IDG.</p>
+      <div class="tbl-wrap" id="t-f1coord"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Quanto da etapa 1 ficou na execução do projeto</h3></div>
+      <p class="c-sub">Do valor já recebido, o que foi para coordenação e o que financiou a operação.</p>
+      <div class="tbl-wrap" id="t-f1res"></div>
+    </div>
+  </div>
+  <div class="callout att" style="margin-top:14px">
+    <div class="ct">
+      <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <path d="M8 2.2 14.5 13.4H1.5z"/><path d="M8 6.4v3.1M8 11.3v.9"/></svg>
+      O que está em jogo no fechamento da etapa 1
+    </div>
+    Os R$ 380.000 pendentes estão presos a uma condição que não depende do IDG: a execução física das obras e a
+    instalação dos elementos estruturais de acessibilidade. Como esse valor, se recebido, é repassado
+    integralmente à coordenação, ele <strong>não financia a execução do projeto</strong> — o que a etapa 1 deixou
+    para a operação já está em caixa. A consequência prática é que o atraso ou a não confirmação desse
+    recebimento afeta o volume de coordenação a receber pelo IDG, e não a capacidade do projeto de honrar seus
+    compromissos.
+  </div>
+</section>
+
+<!-- ============================ ETAPA 2 ============================ -->
+<section id="etapa2">
+  <div class="sec-head">
+    <p class="kicker">Etapa 2</p>
+    <h2>4º aditivo — R$ 625.000</h2>
+    <p class="section-sub">Oito parcelas (15ª a 22ª), nenhuma entregue nem faturada até 13/08/2026. Todo o
+      recurso é destinado à coordenação geral do IDG, o que torna a etapa neutra para o caixa do projeto.</p>
+  </div>
+
+  <div class="tiles four" id="tiles-f2"></div>
+
+  <div class="card">
+    <div class="card-head"><h3>Parcelas do 4º aditivo — prazos, valores e situação</h3></div>
+    <p class="c-sub">Prazos conforme cronograma revisado. As datas com asterisco (15ª, 16ª e 17ª parcelas) foram
+      renegociadas e ainda aguardam confirmação oficial da OEI.</p>
+    <div class="tbl-wrap" id="t-fase2"></div>
+  </div>
+
+  <div class="grid2" style="margin-top:14px">
+    <div class="card">
+      <div class="card-head"><h3>Entrada da etapa 2 x repasse de coordenação</h3></div>
+      <p class="c-sub">Cada real recebido é um real de coordenação paga. Efeito no saldo livre: zero.</p>
+      <div class="tbl-wrap" id="t-f2coord"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Prazos de entrega x previsão de caixa</h3></div>
+      <p class="c-sub">O intervalo entre entrega, emissão de NF e recebimento explica a diferença.</p>
+      <div class="tbl-wrap" id="t-f2prazo"></div>
     </div>
   </div>
 
-  <!-- ===================== RESUMO EXECUTIVO ===================== -->
-  <section>
-    <div class="section-head">
-      <span class="section-num">01</span>
-      <h2>Resumo executivo</h2>
-      <div class="rule"></div>
+  <div class="callout warn" style="margin-top:14px">
+    <div class="ct">
+      <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <circle cx="8" cy="8" r="6.4"/><path d="M8 4.6v3.9l2.4 1.6"/></svg>
+      Atenção ao ritmo das entregas
     </div>
+    A 17ª parcela tinha prazo em <strong>31/08/2026</strong> e a 16ª em <strong>30/09/2026</strong>: as duas
+    primeiras entregas do aditivo estão na janela imediata. Como todo o valor da etapa 2 é repasse de coordenação,
+    atraso não afeta o saldo livre do projeto — mas atrasa o repasse ao IDG e empurra receita e despesa para 2027.
+    O gargalo aqui é de <strong>execução das entregas</strong>, não de caixa.
+  </div>
+</section>
 
-    <div class="pill-group" id="faseFilter">
-      <button class="pill active" data-fase="all">Visão consolidada</button>
-      <button class="pill" data-fase="Fase 1">Fase 1</button>
-      <button class="pill" data-fase="Fase 2">Fase 2</button>
-    </div>
+<!-- ============================ CONSOLIDADO ============================ -->
+<section id="consolidado">
+  <div class="sec-head">
+    <p class="kicker">Consolidado</p>
+    <h2>Etapas 1 e 2 juntas — caixa, coordenação e despesas</h2>
+    <p class="section-sub">Visão somada das duas etapas: como o caixa evoluiu e evoluirá, quanto vai para a
+      coordenação no ciclo 2025–2027 e em que grandes linhas o recurso é aplicado.</p>
+  </div>
 
-    <div class="resumo-grid">
-      <div class="stat-card">
-        <div class="stat-label">Valor total do projeto</div>
-        <div>
-          <div class="stat-value" id="statTotal">—</div>
-          <div class="stat-sub" id="statTotalSub">—</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Total recebido</div>
-        <div>
-          <div class="stat-value paid" id="statPago">—</div>
-          <div class="stat-sub" id="statPagoSub">—</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Total pendente</div>
-        <div>
-          <div class="stat-value pending" id="statPendente">—</div>
-          <div class="stat-sub" id="statPendenteSub">—</div>
-        </div>
-      </div>
-      <div class="seal-card">
-        <svg width="128" height="128" viewBox="0 0 128 128" id="sealSvg"></svg>
-        <div class="seal-caption">Execução<br>financeira</div>
-      </div>
-    </div>
-  </section>
+  <div class="tiles" id="tiles-cons"></div>
 
-  <!-- ===================== VISÃO POR FASE ===================== -->
-  <section>
-    <div class="section-head">
-      <span class="section-num">02</span>
-      <h2>Visão por fase</h2>
-      <div class="rule"></div>
-    </div>
-    <div id="faseRows"></div>
-  </section>
+  <h3 class="sub-h">Evolução do caixa</h3>
+  <div class="card">
+    <div class="card-head"><h3>Saldo acumulado — fev/2025 a dez/2026</h3></div>
+    <p class="c-sub">Saldo inicial da conta antes de fev/2025: R$ 0,00. A linha tracejada marca o período
+      projetado (ago–dez/2026); a marca horizontal é o recurso de R$ 500.000 já dedicado a ações de 2027.</p>
+    <ul class="legend">
+      <li><span class="key line" style="color:var(--s1)"></span><span>Saldo realizado</span></li>
+      <li><span class="key dash" style="color:var(--s1)"></span><span>Saldo projetado</span></li>
+      <li><span class="key line" style="color:var(--warning)"></span><span>Recurso dedicado a 2027 (R$ 500.000)</span></li>
+    </ul>
+    <div class="chart-scroll"><div class="chart" id="c-saldo"></div></div>
+    <p class="scroll-hint">Arraste o gráfico para o lado para ver todos os meses.</p>
+    <details class="tv"><summary>Ver dados em tabela</summary><div class="tbl-wrap" id="t-saldo"></div></details>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>Receita x despesa mensal — 2025 e 2026</h3></div>
+    <p class="c-sub">Os aportes do contrato são concentrados em poucos meses (fev/2025, abr/2025, abr/2026 e
+      jun/2026), o que explica os picos. A despesa projetada de ago/2026 concentra o repasse de coordenação da
+      etapa 1.</p>
+    <ul class="legend">
+      <li><span class="key" style="background:var(--s1)"></span><span>Receita</span></li>
+      <li><span class="key" style="background:var(--s2)"></span><span>Despesa</span></li>
+      <li><span class="key" style="background:var(--s1);opacity:.55"></span><span>Tom mais claro = valor projetado</span></li>
+    </ul>
+    <div class="chart-scroll"><div class="chart" id="c-rd"></div></div>
+    <p class="scroll-hint">Arraste o gráfico para o lado para ver todos os meses.</p>
+    <details class="tv"><summary>Ver dados em tabela</summary><div class="tbl-wrap" id="t-rd"></div></details>
+  </div>
 
-  <!-- ===================== PENDÊNCIAS ===================== -->
-  <section>
-    <div class="section-head">
-      <span class="section-num">03</span>
-      <h2 id="ledgerTitle">Entregáveis pendentes — ordenados por prazo</h2>
-      <div class="rule"></div>
-    </div>
-    <div class="pill-group small" id="statusFilter">
-      <button class="pill active" data-status="todos">Todos os entregáveis</button>
-      <button class="pill" data-status="pendentes">Pendentes</button>
-    </div>
-    <div class="ledger">
-      <div class="ledger-head">
-        <div>Data</div>
-        <div>Valor</div>
-        <div>Entregável</div>
-        <div></div>
-      </div>
-      <div id="pendRows"></div>
-    </div>
-  </section>
+  <h3 class="sub-h">Coordenação geral do IDG — ciclo 2025 a 2027</h3>
+  <div class="card">
+    <div class="card-head"><h3>Quanto já enviamos e quanto ainda enviaremos</h3></div>
+    <p class="c-sub">Colunas empilhadas por etapa de origem do recurso. Total do ciclo:
+      <strong id="coordTot">—</strong>.</p>
+    <ul class="legend" id="l-coord"></ul>
+    <div class="chart" id="c-coord"></div>
+    <p class="fnote">* O total de 2027 inclui R$ 380.000 da etapa 1 condicionados ao recebimento dos produtos 7 e 8
+      ao final das entregas. Se esse recebimento não ocorrer, o repasse correspondente também não ocorre.</p>
+    <details class="tv"><summary>Ver dados em tabela</summary><div class="tbl-wrap" id="t-coord"></div></details>
+  </div>
 
-  <!-- ===================== ANÁLISES ===================== -->
-  <section>
-    <div class="section-head">
-      <span class="section-num">04</span>
-      <h2>Análises</h2>
-      <div class="rule"></div>
-    </div>
-    <div class="analysis-grid" id="analysisGrid"></div>
-  </section>
+  <h3 class="sub-h">Despesas em grandes linhas</h3>
+  <div class="card">
+    <div class="card-head"><h3>Onde o recurso é aplicado — realizado e a realizar</h3></div>
+    <p class="c-sub">Sete grandes linhas, separando o realizado (2025 e jan–jul/2026) do que ainda será
+      realizado até dez/2026. Total das duas pontas: <strong id="despGrandTot">—</strong>.</p>
+    <ul class="legend" id="l-linhas"></ul>
+    <div class="chart" id="c-linhas"></div>
+    <details class="tv"><summary>Ver dados em tabela</summary><div class="tbl-wrap" id="t-linhas"></div></details>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>Composição de cada grande linha</h3></div>
+    <p class="c-sub">Rubricas que compõem cada linha, com a situação de cada uma.</p>
+    <div class="tbl-wrap" id="t-linhasdet"></div>
+  </div>
 
-  <footer>
-    <b>Atualização de prazos — 15ª e 18ª parcelas</b> — Conforme e-mail de 06/07/2026 (Amarílis Lage, IDG), há proposta de adiamento para <b>30/10/2026</b> (15ª) e <b>30/11/2026</b> (18ª), motivada pela ampliação de escopo desses produtos (inclusão de equipamentos e tecnologia, além de mobiliário, conforme ata de 03/02/2026). A SEDUC (Cristiano Goldschmidt) ainda não confirmou essas datas nesta thread — por isso aparecem como <b>"proposta · aguardando SEDUC"</b>, com o histórico completo de datas visível em cada item.<br>
-    <b>Ressalva de dados</b> — As datas de prazo das 16ª e 17ª parcelas do 4º Aditivo constam na planilha de origem como texto com asterisco, associadas a notas de rodapé que indicam renegociação de datas entre SEDUC e IDG ainda sem confirmação oficial por e-mail. Neste painel elas aparecem sinalizadas como <b>"a confirmar"</b> e não entram na ordenação cronológica dos demais itens.<br>
-    <b>Outras inconsistências identificadas na planilha de origem</b> — data de emissão de NF do item "Análise de Contexto Político-Econômico" (Eixo Gestão) grafada como 22/04/0205, provável erro de digitação; data de NF do item "Pesquisa de Mercado" registrada como texto "Confirmando dado" em vez de data.
-  </footer>
+  <div class="card">
+    <div class="card-head"><h3>Recurso dedicado de R$ 500.000 — despesa projetada para 2027</h3></div>
+    <p class="c-sub">Os R$ 500.000 que permanecem em caixa ao final de 2026 não são folga: já têm destinação
+      apontada.</p>
+    <div class="tbl-wrap" id="t-dedicado"></div>
+    <p class="fnote">A abertura por rubrica dessas ações ainda não consta do cronograma financeiro. Por isso o
+      valor aparece como linha única de despesa projetada para 2027, e não está distribuído nas grandes linhas
+      acima, que cobrem apenas 2025 e 2026.</p>
+  </div>
+
+  <h3 class="sub-h">Saldo livre e perspectiva 2027</h3>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-head"><h3>Do saldo em caixa ao saldo livre — dez/2026</h3></div>
+      <div class="tbl-wrap" id="t-livre"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Perspectiva 2027</h3></div>
+      <p class="c-sub">Cenário com base no contrato vigente. Não inclui despesas correntes de operação em 2027,
+        que ainda não estão orçadas.</p>
+      <div class="tbl-wrap" id="t-2027"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ ANEXOS ============================ -->
+<section id="anexos">
+  <div class="sec-head">
+    <p class="kicker">Anexos</p>
+    <h2>Detalhamento de apoio</h2>
+    <p class="section-sub">Base para consultas durante a apresentação: orçamento projetado rubrica a rubrica,
+      fluxo mês a mês, receitas recebidas e pontos a validar com a coordenação financeira.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h3>Orçamento projetado — ago a dez/2026</h3></div>
+    <p class="c-sub">Rubrica por rubrica, mês a mês. Total projetado: <strong id="projTot">—</strong>.</p>
+    <div class="tbl-wrap" id="t-proj"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>Fluxo de caixa mês a mês — 2025 e 2026</h3></div>
+    <p class="c-sub">Realizado x projetado, resultado do mês e saldo acumulado.</p>
+    <div class="tbl-wrap" id="t-fluxo"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>Receitas recebidas — lançamentos</h3></div>
+    <p class="c-sub">Títulos com recebimento efetivado na conta do projeto. Total:
+      <strong id="recTot">—</strong>.</p>
+    <div class="tbl-wrap" id="t-recdet"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>Títulos cancelados e em aberto</h3></div>
+    <p class="c-sub">Não compõem o fluxo de caixa realizado.</p>
+    <div class="tbl-wrap" id="t-recpend"></div>
+  </div>
+  <div class="callout att" style="margin-top:14px">
+    <div class="ct">
+      <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <path d="M8 2.2 14.5 13.4H1.5z"/><path d="M8 6.4v3.1M8 11.3v.9"/></svg>
+      Pontos a validar com a coordenação financeira
+    </div>
+    <ul>
+      <li><strong>Divergência de R$ 50.000 na etapa 1.</strong> O controle de produtos aponta R$ 2.170.000
+        recebidos; o ERP registra R$ 2.120.000 como receita do cliente. Comparando lançamento por lançamento, um
+        produto de R$ 250.000 aparece como R$ 200.000 recebidos em abril/2026 — possivelmente ligado aos títulos
+        cancelados e reemitidos naquele mês.</li>
+      <li><strong>Títulos cancelados:</strong> R$ 200.000 (título 88) e R$ 150.000 (título 87), ambos emitidos em
+        08/04/2026, além de um título em aberto de R$ 3.230,01 com vencimento em 05/08/2026.</li>
+      <li><strong>Datas da etapa 2:</strong> os prazos das 15ª, 16ª e 17ª parcelas foram renegociados e aguardam
+        e-mail oficial do consultor da OEI.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <p><strong>Fontes:</strong> extrações do ERP de receitas e despesas e orçamento aprovado (revisão 4, base de
+    22/04/2026); planilha de controle do projeto com produtos, prazos SIGOEI e status de entrega e pagamento por
+    etapa; informações de contrato e reserva da coordenação financeira do projeto em 13/08/2026.</p>
+  <p><strong>Critérios:</strong> receitas pelo valor efetivamente recebido; despesas pelo valor líquido pago;
+    projeções de ago–dez/2026 conforme orçamento aprovado, acrescidas do repasse de coordenação da etapa 2 no mês
+    de cada recebimento; os R$ 380.000 da etapa 1 tratados como receita contingente de dez/2027, com repasse
+    integral à coordenação, fora do fluxo de 2026; os R$ 500.000 dedicados a ações das fases 1 e 2 tratados como
+    despesa projetada para 2027.</p>
+  <p>Valores em reais (BRL).</p>
+</footer>
 
 </div>
 
+<script id="dados" type="application/json">{"mensal": [{"ano": 2025, "mes": "Janeiro", "n": 1, "recR": 0, "recP": 0, "recT": 0, "despR": 0, "despP": 0, "despT": 0, "res": 0, "saldo": 0.0, "rot": "Jan/25"}, {"ano": 2025, "mes": "Fevereiro", "n": 2, "recR": 150000, "recP": 0, "recT": 150000, "despR": 0, "despP": 0, "despT": 0, "res": 150000, "saldo": 150000.0, "rot": "Fev/25"}, {"ano": 2025, "mes": "Março", "n": 3, "recR": 621.22, "recP": 0, "recT": 621.22, "despR": 43127.4, "despP": 0, "despT": 43127.4, "res": -42506.18, "saldo": 107493.82, "rot": "Mar/25"}, {"ano": 2025, "mes": "Abril", "n": 4, "recR": 210039.27, "recP": 0, "recT": 210039.27, "despR": 9779.65, "despP": 0, "despT": 9779.65, "res": 200259.62, "saldo": 307753.44, "rot": "Abr/25"}, {"ano": 2025, "mes": "Maio", "n": 5, "recR": 103640.48, "recP": 0, "recT": 103640.48, "despR": 33188.35, "despP": 0, "despT": 33188.35, "res": 70452.13, "saldo": 378205.57, "rot": "Mai/25"}, {"ano": 2025, "mes": "Junho", "n": 6, "recR": 154369.62, "recP": 0, "recT": 154369.62, "despR": 12396, "despP": 0, "despT": 12396, "res": 141973.62, "saldo": 520179.19, "rot": "Jun/25"}, {"ano": 2025, "mes": "Julho", "n": 7, "recR": 6160.1, "recP": 0, "recT": 6160.1, "despR": 19855.61, "despP": 0, "despT": 19855.61, "res": -13695.51, "saldo": 506483.68, "rot": "Jul/25"}, {"ano": 2025, "mes": "Agosto", "n": 8, "recR": 5407.02, "recP": 0, "recT": 5407.02, "despR": 138430.18, "despP": 0, "despT": 138430.18, "res": -133023.16, "saldo": 373460.52, "rot": "Ago/25"}, {"ano": 2025, "mes": "Setembro", "n": 9, "recR": 4258.69, "recP": 0, "recT": 4258.69, "despR": 21221.44, "despP": 0, "despT": 21221.44, "res": -16962.75, "saldo": 356497.77, "rot": "Set/25"}, {"ano": 2025, "mes": "Outubro", "n": 10, "recR": 3390.4, "recP": 0, "recT": 3390.4, "despR": 109732.14, "despP": 0, "despT": 109732.14, "res": -106341.74, "saldo": 250156.03, "rot": "Out/25"}, {"ano": 2025, "mes": "Novembro", "n": 11, "recR": 3472.91, "recP": 0, "recT": 3472.91, "despR": 54439.950000000004, "despP": 0, "despT": 54439.950000000004, "res": -50967.04, "saldo": 199188.99, "rot": "Nov/25"}, {"ano": 2025, "mes": "Dezembro", "n": 12, "recR": 1895.12, "recP": 0, "recT": 1895.12, "despR": 128920.26000000004, "despP": 0, "despT": 128920.26000000004, "res": -127025.14, "saldo": 72163.85, "rot": "Dez/25"}, {"ano": 2026, "mes": "Janeiro", "n": 1, "recR": 901.76, "recP": 0, "recT": 901.76, "despR": 18679.989999999998, "despP": 0, "despT": 18679.989999999998, "res": -17778.23, "saldo": 54385.62, "rot": "Jan/26"}, {"ano": 2026, "mes": "Fevereiro", "n": 2, "recR": 664.43, "recP": 0, "recT": 664.43, "despR": 17066.07, "despP": 0, "despT": 17066.07, "res": -16401.64, "saldo": 37983.98, "rot": "Fev/26"}, {"ano": 2026, "mes": "Março", "n": 3, "recR": 653.96, "recP": 0, "recT": 653.96, "despR": 19775.199999999993, "despP": 0, "despT": 19775.199999999993, "res": -19121.24, "saldo": 18862.74, "rot": "Mar/26"}, {"ano": 2026, "mes": "Abril", "n": 4, "recR": 1250459.88, "recP": 0, "recT": 1250459.88, "despR": 9500.599999999999, "despP": 0, "despT": 9500.599999999999, "res": 1240959.28, "saldo": 1259822.02, "rot": "Abr/26"}, {"ano": 2026, "mes": "Maio", "n": 5, "recR": 12613.73, "recP": 0, "recT": 12613.73, "despR": 161077.84, "despP": 0, "despT": 161077.84, "res": -148464.11, "saldo": 1111357.91, "rot": "Mai/26"}, {"ano": 2026, "mes": "Junho", "n": 6, "recR": 283876.79, "recP": 0, "recT": 283876.79, "despR": 10617.3, "despP": 0, "despT": 10617.3, "res": 273259.49, "saldo": 1384617.4, "rot": "Jun/26"}, {"ano": 2026, "mes": "Julho", "n": 7, "recR": 16500.37, "recP": 0, "recT": 16500.37, "despR": 35034.06, "despP": 0, "despT": 35034.06, "res": -18533.69, "saldo": 1366083.71, "rot": "Jul/26"}, {"ano": 2026, "mes": "Agosto", "n": 8, "recR": 0, "recP": 0, "recT": 0, "despR": 0, "despP": 295754, "despT": 295754, "res": -295754, "saldo": 1070329.71, "rot": "Ago/26"}, {"ano": 2026, "mes": "Setembro", "n": 9, "recR": 0, "recP": 0, "recT": 0, "despR": 0, "despP": 105754, "despT": 105754, "res": -105754, "saldo": 964575.71, "rot": "Set/26"}, {"ano": 2026, "mes": "Outubro", "n": 10, "recR": 0, "recP": 115000, "recT": 115000, "despR": 0, "despP": 232268.24, "despT": 232268.24, "res": -117268.24, "saldo": 847307.47, "rot": "Out/26"}, {"ano": 2026, "mes": "Novembro", "n": 11, "recR": 0, "recP": 30000, "recT": 30000, "despR": 0, "despP": 134268.24, "despT": 134268.24, "res": -104268.24, "saldo": 743039.23, "rot": "Nov/26"}, {"ano": 2026, "mes": "Dezembro", "n": 12, "recR": 0, "recP": 45000, "recT": 45000, "despR": 0, "despP": 236436.48, "despT": 236436.48, "res": -191436.48, "saldo": 551602.75, "rot": "Dez/26"}], "proj": [{"projeto": "DIR", "cc": "Financeiro DIR_MUSEDUCA OEI", "conta": "Consultoria Especializada", "vals": [84154, 84154, 86668.24, 86668.24, 173336.48]}, {"projeto": "DIR", "cc": "Financeiro DIR_MUSEDUCA OEI", "conta": "Plano de Saúde", "vals": [9500, 9500, 9500, 9500, 9500]}, {"projeto": "MUSEDUCA", "cc": "Gestão_MUSEDUCA OEI", "conta": "Coordenação IDG", "vals": [190000, 0, 0, 0, 0]}, {"projeto": "MUSEDUCA", "cc": "Gestão_MUSEDUCA OEI", "conta": "Produção de Video", "vals": [4600, 4600, 4600, 4600, 4600]}, {"projeto": "MUSEDUCA", "cc": "Gestão_MUSEDUCA OEI", "conta": "Táxi e Similares", "vals": [500, 500, 500, 500, 1000]}, {"projeto": "MUSEDUCA", "cc": "Gestão_MUSEDUCA OEI", "conta": "Passagem", "vals": [0, 0, 7000, 0, 0]}, {"projeto": "MUSEDUCA", "cc": "Gestão_MUSEDUCA OEI", "conta": "Produção Artística", "vals": [6000, 6000, 6000, 0, 0]}, {"projeto": "MUSEDUCA", "cc": "Gestão_MUSEDUCA OEI", "conta": "Hospedagem", "vals": [0, 0, 2000, 2000, 2000]}, {"projeto": "MUSEDUCA", "cc": "Receita_MUSEDUCA OEI", "conta": "Despesas Tributárias", "vals": [1000, 1000, 1000, 1000, 1000]}, {"projeto": "MUSEDUCA", "cc": "Coordenação_MUSEDUCA OEI", "conta": "Coordenação IDG — repasse da etapa 2", "vals": [0, 0, 115000, 30000, 45000]}], "projTotal": [295754, 105754, 232268.24, 134268.24, 236436.48], "despGrupo": [{"k": "COFINS A RECOLHER", "v": 163612.22, "v2025": 46849.59, "v2026": 116762.63}, {"k": "SERV. COORDENAÇÃO GERAL (IDG) [CR]", "v": 130000, "v2025": 130000, "v2026": 0}, {"k": "ISS (CR)", "v": 106000, "v2025": 30000, "v2026": 76000}, {"k": "HOSPEDAGEM [CR]", "v": 48848.3, "v2025": 48440.4, "v2026": 407.9}, {"k": "SALARIO [CR]", "v": 43071.78, "v2025": 26983.45, "v2026": 16088.33}, {"k": "REEMB. DESPESAS ENTRE PROJETOS-MATRIZ", "v": 42574.11, "v2025": 21044.68, "v2026": 21529.43}, {"k": "SERV. PROGRAMAÇÃO VISUAL [CR]", "v": 41500, "v2025": 41500, "v2026": 0}, {"k": "SERVIÇOS TÉCNICOS ESPECIALIZADOS [CR]", "v": 41000, "v2025": 32000, "v2026": 9000}, {"k": "SERV. CURADORIA [CR]", "v": 39600, "v2025": 39600, "v2026": 0}, {"k": "Passagens (CR)", "v": 27338.98, "v2025": 23926.24, "v2026": 3412.74}, {"k": "INSS FOLHA [CR]", "v": 23341.29, "v2025": 11864.79, "v2026": 11476.5}, {"k": "Outros (30 rubricas)", "v": 135955.36, "v2025": 118881.83, "v2026": 17073.53}], "despCC": [{"k": "Gestão_MUSEDUCA OEI", "v": 335785.89}, {"k": "Receita_MUSEDUCA OEI", "v": 277716.67}, {"k": "Adm Financeiro_MUSEDUCA OEI", "v": 189301.17}, {"k": "Projetos_MUSEDUCA OEI", "v": 40038.31}], "despForn": [{"k": "INST DE DESENVOLVIMENTO E GESTÃO MATRIZ", "v": 172574.11}, {"k": "SECRETARIA DA RECEITA FEDERAL DO BRASIL", "v": 163612.22}, {"k": "Secretaria Municipal de Fazenda - RJ", "v": 106000}, {"k": "RIOTRAVEL TURISMO LTDA", "v": 60644.48}, {"k": "FOLHA DE PAGAMENTO", "v": 45912.09}, {"k": "CUBICULO PRODUCOES CULTURAIS LTDA", "v": 41500}, {"k": "ELEKTRA PRODUCAO CINEMATOGRAFICA LTDA", "v": 39600}, {"k": "INSS SOBRE FOLHA DE PAGAMENTO", "v": 30891.59}, {"k": "MARINA PIQUET FERNANDES", "v": 28384.25}, {"k": "PLUMA AGENCIA E PRODUTORA AUDIOVISUAL LTDA", "v": 25500}, {"k": "LIMA COMUNICACAO CULTURAL LTDA", "v": 19000}, {"k": "INSTITUTO DE DESENVOLVIMENTO E GESTAO - IDG", "v": 16727.06}], "recCat": [{"k": "Contrato OEI — receitas vinculadas", "v": 2120000}, {"k": "Rendimento de aplicação financeira", "v": 87870.51}, {"k": "Reembolso entre projetos (IDG)", "v": 1055.24}], "recRows": [{"dt": "28/02/2025", "cli": "ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS", "cat": "Contrato OEI — receitas vinculadas", "v": 150000, "ano": 2025, "mes": 2}, {"dt": "31/03/2025", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 621.22, "ano": 2025, "mes": 3}, {"dt": "30/04/2025", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 10039.27, "ano": 2025, "mes": 4}, {"dt": "30/04/2025", "cli": "ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS", "cat": "Contrato OEI — receitas vinculadas", "v": 200000, "ano": 2025, "mes": 4}, {"dt": "31/05/2025", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 3640.48, "ano": 2025, "mes": 5}, {"dt": "12/05/2025", "cli": "ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS", "cat": "Contrato OEI — receitas vinculadas", "v": 100000, "ano": 2025, "mes": 5}, {"dt": "16/06/2025", "cli": "ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS", "cat": "Contrato OEI — receitas vinculadas", "v": 150000, "ano": 2025, "mes": 6}, {"dt": "30/06/2025", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 4369.62, "ano": 2025, "mes": 6}, {"dt": "31/07/2025", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 6160.1, "ano": 2025, "mes": 7}, {"dt": "31/08/2025", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 5407.02, "ano": 2025, "mes": 8}, {"dt": "30/09/2025", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 4258.69, "ano": 2025, "mes": 9}, {"dt": "31/10/2025", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 3390.4, "ano": 2025, "mes": 10}, {"dt": "26/11/2025", "cli": "INSTITUTO DE DESENVILVIMENTO E GESTÃO", "cat": "Reembolso entre projetos (IDG)", "v": 805.98, "ano": 2025, "mes": 11}, {"dt": "26/11/2025", "cli": "INSTITUTO DE DESENVILVIMENTO E GESTÃO", "cat": "Reembolso entre projetos (IDG)", "v": 113.12, "ano": 2025, "mes": 11}, {"dt": "26/11/2025", "cli": "INSTITUTO DE DESENVILVIMENTO E GESTÃO", "cat": "Reembolso entre projetos (IDG)", "v": 68.07, "ano": 2025, "mes": 11}, {"dt": "26/11/2025", "cli": "INSTITUTO DE DESENVILVIMENTO E GESTÃO", "cat": "Reembolso entre projetos (IDG)", "v": 68.07, "ano": 2025, "mes": 11}, {"dt": "28/11/2025", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 2417.67, "ano": 2025, "mes": 11}, {"dt": "31/12/2025", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 1895.12, "ano": 2025, "mes": 12}, {"dt": "30/01/2026", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 901.76, "ano": 2026, "mes": 1}, {"dt": "27/02/2026", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 664.43, "ano": 2026, "mes": 2}, {"dt": "31/03/2026", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 653.96, "ano": 2026, "mes": 3}, {"dt": "28/04/2026", "cli": "ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS", "cat": "Contrato OEI — receitas vinculadas", "v": 250000, "ano": 2026, "mes": 4}, {"dt": "24/04/2026", "cli": "ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS", "cat": "Contrato OEI — receitas vinculadas", "v": 150000, "ano": 2026, "mes": 4}, {"dt": "22/04/2026", "cli": "ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS", "cat": "Contrato OEI — receitas vinculadas", "v": 300000, "ano": 2026, "mes": 4}, {"dt": "28/04/2026", "cli": "ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS", "cat": "Contrato OEI — receitas vinculadas", "v": 200000, "ano": 2026, "mes": 4}, {"dt": "22/04/2026", "cli": "ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS", "cat": "Contrato OEI — receitas vinculadas", "v": 200000, "ano": 2026, "mes": 4}, {"dt": "28/04/2026", "cli": "ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS", "cat": "Contrato OEI — receitas vinculadas", "v": 150000, "ano": 2026, "mes": 4}, {"dt": "30/04/2026", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 459.88, "ano": 2026, "mes": 4}, {"dt": "29/05/2026", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 12613.73, "ano": 2026, "mes": 5}, {"dt": "11/06/2026", "cli": "ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS", "cat": "Contrato OEI — receitas vinculadas", "v": 20000, "ano": 2026, "mes": 6}, {"dt": "30/06/2026", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 13876.79, "ano": 2026, "mes": 6}, {"dt": "11/06/2026", "cli": "ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS", "cat": "Contrato OEI — receitas vinculadas", "v": 250000, "ano": 2026, "mes": 6}, {"dt": "31/07/2026", "cli": "ITAÚ UNIBANCO S.A", "cat": "Rendimento de aplicação financeira", "v": 16500.37, "ano": 2026, "mes": 7}], "recCanceladas": [{"dt": "08/04/2026", "cli": "ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS", "titulo": "88", "v": 200000, "status": "Cancelado"}, {"dt": "08/04/2026", "cli": "ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS", "titulo": "87", "v": 150000, "status": "Cancelado"}, {"dt": "30/07/2026", "cli": "INSTITUTO DE DESENVILVIMENTO E GESTÃO", "titulo": "5037/2026", "v": 3230.01, "status": "Aberto"}], "museo": [{"prod": "1", "desc": "Plano de Trabalho", "prazo": "15/01/2025", "entrega": "Entregue no prazo", "pag": "Pago", "nf": "27/02/2025", "v": 150000, "receb": "28/02/2025", "obs": ""}, {"prod": "2", "desc": "Concepção Estratégica", "prazo": "16/03/2025", "entrega": "Entregue no prazo", "pag": "Pago", "nf": "08/05/2025", "v": 100000, "receb": "12/05/2025", "obs": ""}, {"prod": "3", "desc": "Mapeamento de Repertório", "prazo": "15/05/2025", "entrega": "Entregue em 25/02/2026", "pag": "Pago", "nf": "08/04/2026", "v": 250000, "receb": "22/04/2026", "obs": ""}, {"prod": "4", "desc": "Plano Museológico", "prazo": "02/09/2025", "entrega": "Entregue em 19/02/2026", "pag": "Pago", "nf": "08/04/2026", "v": 300000, "receb": "22/04/2026", "obs": ""}, {"prod": "5", "desc": "Projeto Educativo", "prazo": "12/09/2025", "entrega": "Entregue em 19/02/2026", "pag": "Pago", "nf": "08/04/2026", "v": 150000, "receb": "24/04/2026", "obs": ""}, {"prod": "6", "desc": "Projeto de Acessibilidade", "prazo": "12/09/2025", "entrega": "Entregue em 19/02/2026", "pag": "Pago", "nf": "08/04/2026", "v": 250000, "receb": "28/04/2026", "obs": ""}, {"prod": "7", "desc": "Entregas Físicas de Acessibilidade", "prazo": "12/09/2025", "entrega": "Não entregue", "pag": "Condicionado à execução física das obras e instalação dos elementos estruturais de suporte", "nf": "", "v": 360000, "receb": "Não entregue", "obs": "previsto para o final de 2027"}, {"prod": "8", "desc": "Relatório Final", "prazo": "12/09/2025", "entrega": "Não entregue", "pag": "Produto final de síntese — dependente da consolidação de todas as etapas físicas e documentais precedentes", "nf": "", "v": 20000, "receb": "Não entregue", "obs": "previsto para o final de 2027"}], "gestao": [{"prod": "1", "desc": "Análise de Contexto Político-Econômico", "prazo": "14/02/2025", "entrega": "Entregue no prazo", "pag": "Pago", "nf": "22/04/0205", "v": 200000, "receb": "30/04/2025", "obs": ""}, {"prod": "2", "desc": "Pesquisa de Mercado", "prazo": "15/04/2025", "entrega": "Entregue no prazo", "pag": "Pago", "nf": "Confirmando dado", "v": 150000, "receb": "16/06/2025", "obs": ""}, {"prod": "3", "desc": "Plano de Gestão e Governança do Museu", "prazo": "14/06/2025", "entrega": "Entregue em 08/04/2026", "pag": "Pago", "nf": "03/06/2026", "v": 250000, "receb": "11/06/2026", "obs": ""}, {"prod": "4", "desc": "Programa de Capacitação de Equipe", "prazo": "02/09/2025", "entrega": "Entregue em 25/02/2026", "pag": "Pago", "nf": "08/04/2025", "v": 150000, "receb": "28/04/2026", "obs": ""}, {"prod": "5", "desc": "Estratégia e Plano Detalhado de Marca e Comunicação", "prazo": "12/09/2025", "entrega": "Entregue em 19/02/2026", "pag": "Pago", "nf": "08/04/2025", "v": 200000, "receb": "28/04/2026", "obs": ""}, {"prod": "6", "desc": "Relatório Final", "prazo": "12/09/2025", "entrega": "Entregue em 08/04/2026", "pag": "Pago", "nf": "03/06/2025", "v": 20000, "receb": "11/06/2026", "obs": ""}], "fase2": [{"prod": "15a Parcela*", "desc": "Projeto básico do mobiliário para áreas do Receptivo e do Administrativo", "prazo": "14/10/2026****", "entrega": "Não entregue", "pag": "Pendente", "nf": "⚠️ **Pendente**", "v": 30000, "receb": "Pendente", "obs": ""}, {"prod": "16a Parcela**", "desc": "Vídeo Institucional de Divulgação do Projeto", "prazo": "30/09/2026****", "entrega": "Não entregue", "pag": "Pendente", "nf": "⚠️ **Pendente**", "v": 30000, "receb": "Pendente", "obs": ""}, {"prod": "17a Parcela***", "desc": "Assessoria técnica do Plano de Gestão - Desenho de Governança e Modelo de Gestão", "prazo": "31/08/2026****", "entrega": "Não entregue", "pag": "Pendente", "nf": "⚠️ **Pendente**", "v": 85000, "receb": "Pendente", "obs": ""}, {"prod": "18a Parcela", "desc": "Projeto executivo do mobiliário para áreas do Receptivo e do Administrativo", "prazo": "30/10/2026", "entrega": "Não entregue", "pag": "Pendente", "nf": "⚠️ **Pendente**", "v": 45000, "receb": "Pendente", "obs": ""}, {"prod": "19a Parcela", "desc": "Projeto educativo da exposição temporária", "prazo": "11/11/2026", "entrega": "Não entregue", "pag": "Pendente", "nf": "⚠️ **Pendente**", "v": 180000, "receb": "Pendente", "obs": ""}, {"prod": "20a Parcela", "desc": "Assessoria técnica do Plano de Gestão - Modelagem de Gestão de Governança e Operação do Museu", "prazo": "30/11/2026", "entrega": "Não entregue", "pag": "Pendente", "nf": "⚠️ **Pendente**", "v": 85000, "receb": "Pendente", "obs": ""}, {"prod": "21a Parcela", "desc": "Assessoria técnica do Plano de Gestão - Apoio técnico na impleentação do Plano de Comunicação", "prazo": "30/04/2027", "entrega": "Não entregue", "pag": "Pendente", "nf": "⚠️ **Pendente**", "v": 85000, "receb": "Pendente", "obs": ""}, {"prod": "22a Parcela", "desc": "Assessoria técnica do Plano de Gestão - Consolidação final da assessoria de implementação Plano Museológico e do Plano de gestão", "prazo": "31/07/2027", "entrega": "Não entregue", "pag": "Pendente", "nf": "⚠️ **Pendente**", "v": 85000, "receb": "Pendente", "obs": ""}], "linhas": [{"k": "Tributos sobre a receita", "r2025": 76849.59, "r2026": 192763.02, "p2026": 5000.0, "tot": 274612.61, "det": [{"k": "COFINS A RECOLHER", "v": 163612.22}, {"k": "ISS (CR)", "v": 106000}, {"k": "[projetado] Despesas Tributárias", "v": 5000}, {"k": "PIS/COFINS/CSLL A RECOLHER", "v": 0.39}]}, {"k": "Coordenação geral do IDG", "r2025": 130000.0, "r2026": 0.0, "p2026": 380000.0, "tot": 510000.0, "det": [{"k": "[projetado] Coordenação IDG", "v": 190000}, {"k": "SERV. COORDENAÇÃO GERAL (IDG) [CR]", "v": 130000}, {"k": "[projetado] Coordenação IDG — repasse da etapa 2", "v": 190000}]}, {"k": "Serviços técnicos e consultorias", "r2025": 157594.0, "r2026": 9000.0, "p2026": 555980.96, "tot": 722574.96, "det": [{"k": "[projetado] Consultoria Especializada", "v": 514980.96}, {"k": "SERV. PROGRAMAÇÃO VISUAL [CR]", "v": 41500}, {"k": "SERVIÇOS TÉCNICOS ESPECIALIZADOS [CR]", "v": 41000}, {"k": "SERV. CURADORIA [CR]", "v": 39600}, {"k": "[projetado] Produção de Video", "v": 23000}, {"k": "SERV PESQUISA PESQUISAD. CIENTÍFICOS(CR)", "v": 20650}, {"k": "[projetado] Produção Artística", "v": 18000}, {"k": "SERV. PRODUÇÃO DE VIDEO [CR]", "v": 16000}, {"k": "SERV. REDAÇÃO REVISÃO EDI DE TEXTOS [CR]", "v": 6964}, {"k": "SERVIÇO DE BUFFET E COFFEE BREAK [CR]", "v": 880}]}, {"k": "Pessoal e encargos", "r2025": 59880.79, "r2026": 38801.63, "p2026": 47500.0, "tot": 146182.42, "det": [{"k": "[projetado] Plano de Saúde", "v": 47500}, {"k": "SALARIO [CR]", "v": 43071.78}, {"k": "INSS FOLHA [CR]", "v": 23341.29}, {"k": "IRRF FOLHA", "v": 6936.17}, {"k": "Ticket Flex - Alimentação/Refeição (CR)", "v": 6390}, {"k": "FGTS FOLHA [CR]", "v": 4913.04}, {"k": "PLANO DE SAÚDE [CR]", "v": 3362.3}, {"k": "VALE TRANSPORTE [CR]", "v": 2813.0}, {"k": "TAXAS DIVERSAS [CR]", "v": 1968.0}, {"k": "VALE ALIMENTAÇÃO [CR]", "v": 1870}, {"k": "PROVISAO 13° [CR]", "v": 1525.21}, {"k": "13° SALÁRIO [CR]", "v": 1315.1}, {"k": "PIS FOLHA DE SALARIO", "v": 614.13}, {"k": "SERV. ASSESSORIA CONTÁBIL [CR]", "v": 175.31}, {"k": "SEGUROS DIVERSOS [CR]", "v": 143.34}, {"k": "Seguro de vida (CR)", "v": 131.3}, {"k": "SERV. ASSESSORIA CONTÁBIL [SR]", "v": 53.76}, {"k": "SERV. PCMSO / PPRA / O. NATUREZA [SR]", "v": 41.81}, {"k": "SERV. PCMSO / PPRA / O. DE NATUREZA [CR]", "v": 16.88}]}, {"k": "Viagens, hospedagem e deslocamento", "r2025": 103586.02, "r2026": 6961.37, "p2026": 16000.0, "tot": 126547.39, "det": [{"k": "HOSPEDAGEM [CR]", "v": 48848.3}, {"k": "Passagens (CR)", "v": 27338.98}, {"k": "Diária de Viagem (CR)", "v": 16800}, {"k": "[projetado] Passagem", "v": 7000}, {"k": "Passagens (SR)", "v": 6191.87}, {"k": "[projetado] Hospedagem", "v": 6000}, {"k": "HOSPEDAGEM [SR]", "v": 5458.13}, {"k": "TAXI E SIMILARES [CR]", "v": 3996.43}, {"k": "[projetado] Táxi e Similares", "v": 3000}, {"k": "TAXI E SIMILARES [SR]", "v": 1858.68}, {"k": "DESP COM ESTACIONAMENTO E PEDAGIOS[CR]", "v": 55}]}, {"k": "Rateios e reembolsos IDG", "r2025": 37771.74, "r2026": 21529.43, "p2026": 0.0, "tot": 59301.17, "det": [{"k": "REEMB. DESPESAS ENTRE PROJETOS-MATRIZ", "v": 42574.11}, {"k": "REEMBOLSO DE DESPESA MJB", "v": 16727.06}]}, {"k": "Despesas financeiras", "r2025": 5408.84, "r2026": 2695.61, "p2026": 0.0, "tot": 8104.45, "det": [{"k": "IR S/ APLICAÇÃO FINANCEIRA [CR]", "v": 7817.04}, {"k": "IOF [CR]", "v": 287.41}]}], "totais": {"recR": 2208925.75, "recP": 190000, "recT": 2398925.75, "despR": 842842.04, "despP": 1004480.96, "despT": 1847323.0}, "tot2025": {"recT": 643254.83, "despT": 571090.98, "res": 72163.85}, "tot2026": {"recT": 1755670.92, "despT": 1276232.02, "res": 479438.9}, "linhasTot": 1847323.0, "linhasPer": [571090.98, 271751.06, 1004480.96]}</script>
 <script>
-const DATA = {"eixos": {"Eixo Museológico": [{"item": 1, "desc": "Plano de Trabalho", "prazo": "2025-01-15", "valor": 150000, "status_entrega": "Entregue no prazo", "pago": true}, {"item": 2, "desc": "Concepção Estratégica", "prazo": "2025-03-16", "valor": 100000, "status_entrega": "Entregue no prazo", "pago": true}, {"item": 3, "desc": "Mapeamento de Repertório", "prazo": "2025-05-15", "valor": 250000, "status_entrega": "Entregue em 25/02/2026", "pago": true}, {"item": 4, "desc": "Plano Museológico", "prazo": "2025-09-02", "valor": 300000, "status_entrega": "Entregue em 19/02/2026", "pago": true}, {"item": 5, "desc": "Projeto Educativo", "prazo": "2025-09-12", "valor": 150000, "status_entrega": "Entregue em 19/02/2026", "pago": true}, {"item": 6, "desc": "Projeto de Acessibilidade", "prazo": "2025-09-12", "valor": 250000, "status_entrega": "Entregue em 19/02/2026", "pago": true}, {"item": 7, "desc": "Entregas Físicas de Acessibilidade", "prazo": "2025-09-12", "valor": 360000, "status_entrega": "Não entregue — condicionado à execução física das obras e instalação dos elementos estruturais de suporte", "pago": false}, {"item": 8, "desc": "Relatório Final", "prazo": "2025-09-12", "valor": 20000, "status_entrega": "Não entregue — dependente da consolidação de todas as etapas físicas e documentais precedentes", "pago": false}], "Eixo Gestão e Governança": [{"item": 1, "desc": "Análise de Contexto Político-Econômico", "prazo": "2025-02-14", "valor": 200000, "status_entrega": "Entregue no prazo", "pago": true}, {"item": 2, "desc": "Pesquisa de Mercado", "prazo": "2025-04-15", "valor": 150000, "status_entrega": "Entregue no prazo", "pago": true}, {"item": 3, "desc": "Plano de Gestão e Governança do Museu", "prazo": "2025-06-14", "valor": 250000, "status_entrega": "Entregue em 08/04/2026", "pago": true}, {"item": 4, "desc": "Programa de Capacitação de Equipe", "prazo": "2025-09-02", "valor": 150000, "status_entrega": "Entregue em 25/02/2026", "pago": true}, {"item": 5, "desc": "Estratégia e Plano Detalhado de Marca e Comunicação", "prazo": "2025-09-12", "valor": 200000, "status_entrega": "Entregue em 19/02/2026", "pago": true}, {"item": 6, "desc": "Relatório Final", "prazo": "2025-09-12", "valor": 20000, "status_entrega": "Entregue em 08/04/2026", "pago": true}], "4º Aditivo de Contrato": [{"item": "15ª Parcela", "desc": "Projeto básico do mobiliário para áreas do Receptivo e do Administrativo", "prazo": null, "valor": 30000, "status_entrega": "Não entregue", "pago": false, "negociacao": true, "prazo_datas": [{"label": "Original SEDUC (cronograma inicial)", "data": "2026-08-11"}, {"label": "Indicado na planilha (SIGOEI)", "data": "2026-10-14"}, {"label": "Proposta IDG em 06/07/2026 — aguardando aceite SEDUC", "data": "2026-10-30"}], "nota_escopo": "E-mail de 06/07/2026 (IDG): adiamento solicitado por ampliação de escopo (inclusão de equipamentos e tecnologia, além de mobiliário, conforme ata de 03/02/2026). Aguardando retorno formal da SEDUC sobre o prazo."}, {"item": "16ª Parcela", "desc": "Vídeo Institucional de Divulgação do Projeto", "prazo": null, "prazo_incerto": "30/09/2026", "valor": 30000, "status_entrega": "Não entregue", "pago": false}, {"item": "17ª Parcela", "desc": "Assessoria técnica do Plano de Gestão — Desenho de Governança e Modelo de Gestão", "prazo": null, "prazo_incerto": "31/08/2026", "valor": 85000, "status_entrega": "Não entregue", "pago": false}, {"item": "18ª Parcela", "desc": "Projeto executivo do mobiliário para áreas do Receptivo e do Administrativo", "prazo": null, "valor": 45000, "status_entrega": "Não entregue", "pago": false, "negociacao": true, "prazo_datas": [{"label": "Registrado anteriormente (SIGOEI)", "data": "2026-10-30"}, {"label": "Proposta IDG em 06/07/2026 — aguardando aceite SEDUC", "data": "2026-11-30"}], "nota_escopo": "E-mail de 06/07/2026 (IDG): adiamento solicitado por ampliação de escopo (inclusão de equipamentos e tecnologia, além de mobiliário, conforme ata de 03/02/2026). Aguardando retorno formal da SEDUC sobre o prazo."}, {"item": "19ª Parcela", "desc": "Projeto educativo da exposição temporária", "prazo": "2026-11-11", "valor": 180000, "status_entrega": "Não entregue", "pago": false}, {"item": "20ª Parcela", "desc": "Assessoria técnica do Plano de Gestão — Modelagem de Gestão de Governança e Operação do Museu", "prazo": "2026-11-30", "valor": 85000, "status_entrega": "Não entregue", "pago": false}, {"item": "21ª Parcela", "desc": "Assessoria técnica do Plano de Gestão — Apoio técnico na implementação do Plano de Comunicação", "prazo": "2027-04-30", "valor": 85000, "status_entrega": "Não entregue", "pago": false}, {"item": "22ª Parcela", "desc": "Assessoria técnica do Plano de Gestão — Consolidação final da assessoria de implementação do Plano Museológico e do Plano de Gestão", "prazo": "2027-07-31", "valor": 85000, "status_entrega": "Não entregue", "pago": false}]}};
+(function(){
+"use strict";
+var D = JSON.parse(document.getElementById('dados').textContent);
 
-const fmtBRL = (v) => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits: 0, maximumFractionDigits: 0});
-const fmtBRLcents = (v) => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-
-const TODAY = new Date('2026-08-07T00:00:00');
-
-function parseDate(s){
-  if(!s) return null;
-  return new Date(s + 'T00:00:00');
+/* ---------------- helpers ---------------- */
+var nf2 = new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+var nf0 = new Intl.NumberFormat('pt-BR',{maximumFractionDigits:0});
+function brl(v){ return 'R$ ' + nf2.format(v||0); }
+function brl0(v){ return 'R$ ' + nf0.format(v||0); }
+function brlNeg(v){ return '<span class="neg">−' + brl0(Math.abs(v)) + '</span>'; }
+function pct(v,t){ return (100*v/t).toLocaleString('pt-BR',{maximumFractionDigits:1})+'%'; }
+function compact(v){
+  var a = Math.abs(v);
+  if(a >= 1e6) return (v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1}) + ' mi';
+  if(a >= 1e3) return (v/1e3).toLocaleString('pt-BR',{maximumFractionDigits:0}) + ' mil';
+  return nf0.format(v);
 }
-function fmtDateBR(d){
-  if(!d) return '—';
-  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'});
+function el(t,c,h){ var e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e; }
+function cssv(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function svgEl(n,at){ var e=document.createElementNS('http://www.w3.org/2000/svg',n);
+  for(var k in at){ if(at[k]!=null) e.setAttribute(k,at[k]); } return e; }
+var _mctx = document.createElement('canvas').getContext('2d');
+function measure(s, px, weight){
+  _mctx.font = (weight?weight+' ':'') + px + 'px ' + cssv('--sans');
+  return _mctx.measureText(s).width;
 }
-function daysDiff(d){
-  return Math.round((d - TODAY) / (1000*60*60*24));
+function fitText(s, maxPx, px){
+  if(measure(s,px) <= maxPx) return s;
+  var t = s;
+  while(t.length > 1 && measure(t+'…',px) > maxPx) t = t.slice(0,-1);
+  return t.replace(/[\s·—-]+$/,'') + '…';
 }
-
-// ---------- flatten ----------
-const FASE_MAP = {
-  'Eixo Museológico': 'Fase 1',
-  'Eixo Gestão e Governança': 'Fase 1',
-  '4º Aditivo de Contrato': 'Fase 2',
-};
-const FASE_LABEL = {
-  'Fase 1': 'Concepção, planos e produtos base',
-  'Fase 2': '4º Aditivo — ocupação, mobiliário e consolidação',
-};
-
-let allItems = [];
-Object.entries(DATA.eixos).forEach(([eixo, items]) => {
-  items.forEach(it => allItems.push({...it, eixo, fase: FASE_MAP[eixo]}));
-});
-
-const totalGeral = allItems.reduce((s,i)=>s+i.valor,0);
-const totalPago = allItems.filter(i=>i.pago).reduce((s,i)=>s+i.valor,0);
-const totalPendente = totalGeral - totalPago;
-const pctPago = totalPago/totalGeral*100;
-
-document.getElementById('genDate').textContent = TODAY.toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'});
-document.getElementById('totalItensMeta').textContent = allItems.length;
-
-// ---------- estado dos filtros ----------
-let currentFase = 'all';       // 'all' | 'Fase 1' | 'Fase 2'
-let currentStatus = 'todos'; // 'pendentes' | 'todos'
-
-function scopedItems(fase){
-  return fase === 'all' ? allItems : allItems.filter(i => i.fase === fase);
+function niceMax(v){
+  if(v<=0) return 1;
+  var e = Math.pow(10, Math.floor(Math.log10(v)));
+  var m = v/e, s;
+  if(m<=1) s=1; else if(m<=1.5) s=1.5; else if(m<=2) s=2; else if(m<=2.5) s=2.5;
+  else if(m<=3) s=3; else if(m<=4) s=4; else if(m<=5) s=5; else if(m<=7.5) s=7.5; else s=10;
+  return s*e;
 }
-
-// ---------- resumo executivo ----------
-function renderResumo(fase){
-  const items = scopedItems(fase);
-  const total = items.reduce((s,i)=>s+i.valor,0);
-  const pago = items.filter(i=>i.pago).reduce((s,i)=>s+i.valor,0);
-  const pend = total - pago;
-  const pct = total ? (pago/total*100) : 0;
-  const scopeLabel = fase === 'all' ? 'do projeto' : `— ${fase}`;
-
-  document.getElementById('statTotal').textContent = fmtBRL(total);
-  document.getElementById('statTotalSub').textContent = items.length + ' entregáveis ' + scopeLabel;
-  document.getElementById('statPago').textContent = fmtBRL(pago);
-  document.getElementById('statPagoSub').textContent = items.filter(i=>i.pago).length + ' entregas quitadas';
-  document.getElementById('statPendente').textContent = fmtBRL(pend);
-  document.getElementById('statPendenteSub').textContent = items.filter(i=>!i.pago).length + ' entregas em aberto';
-
-  renderSeal(pct);
-}
-
-// ---------- seal donut ----------
-function renderSeal(pct){
-  const svg = document.getElementById('sealSvg');
-  const cx=64, cy=64, r=52;
-  const circumference = 2*Math.PI*r;
-  const offset = circumference * (1 - pct/100);
-  svg.innerHTML = `
-    <circle cx="${cx}" cy="${cy}" r="${r+8}" fill="none" stroke="#6c7178" stroke-width="1" stroke-dasharray="1 5"/>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#61666f" stroke-width="9"/>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#e0b93a" stroke-width="9"
-      stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
-      stroke-linecap="butt" transform="rotate(-90 ${cx} ${cy})"/>
-    <text x="${cx}" y="${cy-4}" text-anchor="middle" class="seal-pct" font-size="21" font-weight="600" fill="#ffffff">${pct.toFixed(1)}%</text>
-    <text x="${cx}" y="${cy+14}" text-anchor="middle" class="seal-pct" font-size="9" fill="#a3a8ae" letter-spacing="1">PAGO</text>
-  `;
-}
-
-// ---------- visão por fase (sempre mostra as duas, destaca a selecionada) ----------
-function renderFaseRows(fase){
-  const container = document.getElementById('faseRows');
-  container.innerHTML = '';
-  const fases = ['Fase 1', 'Fase 2'];
-  fases.forEach(f => {
-    const items = allItems.filter(i => i.fase === f);
-    const total = items.reduce((s,i)=>s+i.valor,0);
-    const pago = items.filter(i=>i.pago).reduce((s,i)=>s+i.valor,0);
-    const pend = total - pago;
-    const pctP = total ? (pago/total*100) : 0;
-    const eixosDaFase = [...new Set(items.map(i=>i.eixo))];
-    const row = document.createElement('div');
-    let cls = 'fase-row';
-    if(fase !== 'all'){ cls += (f === fase) ? ' selected' : ' dimmed'; }
-    row.className = cls;
-    row.innerHTML = `
-      <div class="fase-name">
-        <span class="fase-tag">${f}</span>
-        <div>${FASE_LABEL[f]}</div>
-        <small>${eixosDaFase.join(' · ')}<br>${items.length} entregáveis · ${fmtBRL(total)}</small>
-      </div>
-      <div class="fase-track">
-        <div class="bar-fill" style="width:${pctP}%"></div>
-        <div class="bar-fill pending-fill" style="width:${100-pctP}%"></div>
-      </div>
-      <div class="fase-figures">
-        <span class="pct">${pctP.toFixed(1)}% pago</span><br>
-        <span class="p">pago ${fmtBRL(pago)}</span><br>
-        <span class="q">pendente ${fmtBRL(pend)}</span>
-      </div>
-    `;
-    container.appendChild(row);
-  });
-}
-
-// ---------- lista de entregáveis (agrupada por eixo, filtrada por fase + status) ----------
-function renderLedger(fase, status){
-  const outer = document.getElementById('pendRows');
-  outer.innerHTML = '';
-
-  const title = document.getElementById('ledgerTitle');
-  const faseTxt = fase === 'all' ? '' : ` — ${fase}`;
-  title.textContent = (status === 'pendentes' ? 'Entregáveis pendentes' : 'Todos os entregáveis') + ' — agrupados por eixo' + faseTxt;
-
-  let scope = scopedItems(fase);
-  if(status === 'pendentes'){ scope = scope.filter(i => !i.pago); }
-
-  if(scope.length === 0){
-    outer.innerHTML = `<div class="ledger-item"><div class="ledger-summary" style="cursor:default"><div style="color:var(--text-dim); grid-column: 1 / -1;">Nenhum entregável nesta seleção.</div></div></div>`;
-    return;
+function roundRectPath(x,y,w,h,r,corners){
+  r = Math.min(r, w/2, h/2); if(r<0) r=0;
+  if(corners==='top'){
+    return 'M'+x+' '+(y+h)+'V'+(y+r)+'a'+r+' '+r+' 0 0 1 '+r+' -'+r+'h'+(w-2*r)+
+           'a'+r+' '+r+' 0 0 1 '+r+' '+r+'V'+(y+h)+'Z';
   }
-
-  function renderRow(target, it, statusColor, tagHtml, prazoHtml, detailsExtraHtml){
-    const div = document.createElement('div');
-    div.className = 'ledger-item';
-    div.innerHTML = `
-      <div class="ledger-summary" style="color:${statusColor}">
-        <div class="ledger-prazo">${prazoHtml}</div>
-        <div class="ledger-valor">${fmtBRL(it.valor)}</div>
-        <div class="ledger-desc-inline">${it.desc}</div>
-        <button type="button" class="ledger-toggle" aria-label="Ver detalhes">+</button>
-      </div>
-      <div class="ledger-details">
-        <div class="ledger-desc-full"><span class="ledger-tag-wrap">${tagHtml}</span><span class="eixo-tiny">${it.fase} · ${it.eixo} · item ${it.item}</span>${it.status_entrega ? `<span class="note">${it.status_entrega}</span>` : ''}${it.nota_escopo ? `<span class="note">${it.nota_escopo}</span>` : ''}${detailsExtraHtml || ''}</div>
-      </div>
-    `;
-    const btn = div.querySelector('.ledger-toggle');
-    const details = div.querySelector('.ledger-details');
-    const summary = div.querySelector('.ledger-summary');
-    function toggle(){
-      const isOpen = details.classList.toggle('open');
-      btn.classList.toggle('open', isOpen);
-      btn.textContent = isOpen ? '–' : '+';
-    }
-    btn.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
-    summary.addEventListener('click', toggle);
-    target.appendChild(div);
+  if(corners==='right'){
+    return 'M'+x+' '+y+'h'+(w-r)+'a'+r+' '+r+' 0 0 1 '+r+' '+r+'v'+(h-2*r)+
+           'a'+r+' '+r+' 0 0 1 -'+r+' '+r+'H'+x+'Z';
   }
+  return 'M'+x+' '+y+'h'+w+'v'+h+'h'+(-w)+'Z';
+}
 
-  const eixoOrder = Object.keys(DATA.eixos).filter(e => fase === 'all' || FASE_MAP[e] === fase);
-  let firstGroup = true;
+/* ---------------- números-base ---------------- */
+var SALDO_DEZ = 551602.75;
+var RESERVA_F1 = 500000;
+var LIVRE = SALDO_DEZ - RESERVA_F1;               /* 51.602,75 */
+var F1_TOT = 2550000, F1_MUSEO = 1580000, F1_GESTAO = 970000;
+var F1_RECEB = 2170000, F1_ARECEBER = 380000, F1_ERP = 2120000;
+var F2_TOT = 625000, F2_CAIXA26 = 190000, F2_CAIXA27 = 435000;
+var F2_PRAZO26 = 455000, F2_PRAZO27 = 170000;
+var COORD_F1_25 = 130000, COORD_F1_26 = 190000, COORD_F1_27 = 380000;
+var COORD_F1 = COORD_F1_25 + COORD_F1_26;            /* 320.000 — já no fluxo 2025/2026 */
+var COORD_F1_TOT = COORD_F1 + COORD_F1_27;           /* 700.000 */
+var COORD_CICLO = COORD_F1_TOT + F2_TOT;             /* 1.325.000 */
+var DEDICADO = RESERVA_F1;                           /* 500.000 — despesa projetada para 2027 */
+var APLICADO_F1 = F1_RECEB - COORD_F1;               /* 1.850.000 */
+var SALDO_ORC = 741602.75;                           /* orçamento aprovado, sem o repasse da etapa 2 */
+var SALDO_DEZ27 = SALDO_DEZ - DEDICADO;              /* 51.602,75 */
 
-  eixoOrder.forEach(eixo => {
-    const eixoItems = scope.filter(i => i.eixo === eixo);
-    if(eixoItems.length === 0) return;
+document.getElementById('heroVal').textContent = brl(SALDO_DEZ);
+document.getElementById('heroRes').textContent = brl0(RESERVA_F1);
+document.getElementById('heroLivre').textContent = brl(LIVRE);
+document.getElementById('coordTot').textContent = brl0(COORD_CICLO);
 
-    const total = eixoItems.reduce((s,i)=>s+i.valor,0);
-    const pago = eixoItems.filter(i=>i.pago).reduce((s,i)=>s+i.valor,0);
-    const pend = total - pago;
-    const pctP = total ? (pago/total*100) : 0;
-
-    const group = document.createElement('div');
-    group.className = 'ledger-eixo-group';
-
-    const header = document.createElement('div');
-    header.className = 'ledger-eixo-header' + (firstGroup ? ' first' : '');
-    firstGroup = false;
-    header.innerHTML = `
-      <div class="eixo-name">${eixo}<small>${eixoItems.length} entregáveis · ${fmtBRL(total)}</small></div>
-      <div class="bar-track">
-        <div class="bar-fill" style="width:${pctP}%"></div>
-        <div class="bar-fill pending-fill" style="width:${100-pctP}%"></div>
-      </div>
-      <div class="eixo-figures">
-        <span class="p">pago ${fmtBRL(pago)}</span><br>
-        <span class="q">pendente ${fmtBRL(pend)}</span>
-      </div>
-      <button type="button" class="ledger-toggle" aria-label="Ver entregáveis">+</button>
-    `;
-    group.appendChild(header);
-
-    const itemsWrap = document.createElement('div');
-    itemsWrap.className = 'ledger-eixo-items';
-    group.appendChild(itemsWrap);
-
-    const btn = header.querySelector('.ledger-toggle');
-    function toggleGroup(){
-      const isOpen = itemsWrap.classList.toggle('open');
-      btn.classList.toggle('open', isOpen);
-      btn.textContent = isOpen ? '–' : '+';
-    }
-    btn.addEventListener('click', (e) => { e.stopPropagation(); toggleGroup(); });
-    header.addEventListener('click', toggleGroup);
-
-    if(eixo === '4º Aditivo de Contrato'){
-      // ordenar TODOS os produtos deste eixo por data (melhor data disponível), sem agrupar por categoria
-      function effectiveDate(it){
-        if(it.pago) return parseDate(it.prazo);
-        if(it.negociacao) return parseDate(it.prazo_datas[it.prazo_datas.length-1].data);
-        if(it.prazo_incerto) return parseDate(it.prazo_incerto.split(' ')[0].split('/').reverse().join('-'));
-        return parseDate(it.prazo);
-      }
-      const ordemManual = ['17ª Parcela','16ª Parcela','15ª Parcela','18ª Parcela','19ª Parcela','20ª Parcela','21ª Parcela','22ª Parcela'];
-      const ordered = [...eixoItems].sort((a,b) => ordemManual.indexOf(a.item) - ordemManual.indexOf(b.item));
-
-      ordered.forEach(it => {
-        if(it.pago){
-          renderRow(itemsWrap, it, 'var(--status-paid)', `<span class="ledger-tag tag-paid">pago</span>`, `${fmtDateBR(parseDate(it.prazo))}`);
-        } else if(it.negociacao){
-          const hist = it.prazo_datas.map((p, idx) => {
-            const isLast = idx === it.prazo_datas.length - 1;
-            return `<div class="prazo-hist-row ${isLast ? 'current' : ''}"><span class="d">${fmtDateBR(parseDate(p.data))}</span> — ${p.label}</div>`;
-          }).join('');
-          renderRow(itemsWrap, it, 'var(--status-review)',
-            `<span class="ledger-tag tag-negociacao">proposta · SEDUC</span>`,
-            `${fmtDateBR(parseDate(it.prazo_datas[it.prazo_datas.length-1].data))}`,
-            `<div class="prazo-hist">${hist}</div>`
-          );
-        } else if(it.prazo_incerto){
-          renderRow(itemsWrap, it, 'var(--status-review)',
-            `<span class="ledger-tag tag-unclear">a confirmar</span>`,
-            `${it.prazo_incerto}`,
-            `<div class="note" style="margin-top:8px">A CONFIRMAR</div>`
-          );
-        } else {
-          const d = parseDate(it.prazo);
-          const dd = daysDiff(d);
-          let tag, statusColor;
-          if(dd < 0){
-            tag = `<span class="ledger-tag tag-overdue">atrasado ${Math.abs(dd)}d</span>`;
-            statusColor = 'var(--status-overdue)';
-          } else if(dd <= 45){
-            tag = `<span class="ledger-tag tag-soon">em ${dd}d</span>`;
-            statusColor = 'var(--status-ontime)';
-          } else {
-            tag = `<span class="ledger-tag tag-normal">em ${dd}d</span>`;
-            statusColor = 'var(--status-ontime)';
-          }
-          renderRow(itemsWrap, it, statusColor, tag, `${fmtDateBR(d)}`);
-        }
-      });
-
-    } else {
-      const pagos = eixoItems.filter(i => i.pago)
-        .map(i => ({...i, _d: parseDate(i.prazo)}))
-        .sort((a,b) => (a._d||0) - (b._d||0));
-      const emNegociacao = eixoItems.filter(i => !i.pago && i.negociacao);
-      const comDataIncerta = eixoItems.filter(i => !i.pago && i.prazo_incerto && !i.negociacao);
-      const comData = eixoItems.filter(i => !i.pago && i.prazo && !i.prazo_incerto && !i.negociacao)
-        .map(i => ({...i, _d: parseDate(i.prazo)}))
-        .sort((a,b) => a._d - b._d);
-
-      // 1) itens em negociação ativa — proposta aguardando SEDUC (amarelo)
-      emNegociacao.forEach(it => {
-        const hist = it.prazo_datas.map((p, idx) => {
-          const isLast = idx === it.prazo_datas.length - 1;
-          return `<div class="prazo-hist-row ${isLast ? 'current' : ''}"><span class="d">${fmtDateBR(parseDate(p.data))}</span> — ${p.label}</div>`;
-        }).join('');
-        renderRow(itemsWrap, it, 'var(--status-review)',
-          `<span class="ledger-tag tag-negociacao">proposta · SEDUC</span>`,
-          `${fmtDateBR(parseDate(it.prazo_datas[it.prazo_datas.length-1].data))}`,
-          `<div class="prazo-hist">${hist}</div>`
-        );
-      });
-
-      // 2) datas incertas sem proposta ativa — a confirmar (amarelo)
-      comDataIncerta.forEach(it => {
-        renderRow(itemsWrap, it, 'var(--status-review)',
-          `<span class="ledger-tag tag-unclear">a confirmar</span>`,
-          `${it.prazo_incerto}`,
-          `<div class="note" style="margin-top:8px">A CONFIRMAR</div>`
-        );
-      });
-
-      // 3) datas concretas pendentes — verde (no prazo) ou vermelho (atrasado)
-      comData.forEach(it => {
-        const dd = daysDiff(it._d);
-        let tag, statusColor;
-        if(dd < 0){
-          tag = `<span class="ledger-tag tag-overdue">atrasado ${Math.abs(dd)}d</span>`;
-          statusColor = 'var(--status-overdue)';
-        } else if(dd <= 45){
-          tag = `<span class="ledger-tag tag-soon">em ${dd}d</span>`;
-          statusColor = 'var(--status-ontime)';
-        } else {
-          tag = `<span class="ledger-tag tag-normal">em ${dd}d</span>`;
-          statusColor = 'var(--status-ontime)';
-        }
-        renderRow(itemsWrap, it, statusColor, tag, `${fmtDateBR(it._d)}`);
-      });
-
-      // 4) já pagos/entregues (só aparece em "todos") — azul
-      pagos.forEach(it => {
-        renderRow(itemsWrap, it, 'var(--status-paid)', `<span class="ledger-tag tag-paid">pago</span>`, `${fmtDateBR(it._d)}`);
-      });
-    }
-
-    outer.appendChild(group);
+function tiles(hostId, arr){
+  var tg = document.getElementById(hostId);
+  arr.forEach(function(t){
+    var d = el('div','tile');
+    d.appendChild(el('p','t-label',t.l));
+    d.appendChild(el('p','t-val',t.v));
+    if(t.chip) d.appendChild(el('span','chip','<span class="dot" style="background:'+t.chipc+'"></span>'+t.chip));
+    d.appendChild(el('p','t-note',t.n));
+    tg.appendChild(d);
   });
 }
 
-// ---------- análises (visão geral, não filtrada) ----------
-function renderAnalysis(){
-  const container = document.getElementById('analysisGrid');
-  container.innerHTML = '';
+tiles('tiles-f1',[
+  {l:'Contratado na etapa 1', v:brl0(F1_TOT),
+   n:'Eixo Museológico R$ 1.580.000 (8 produtos) + eixo Gestão e Governança R$ 970.000 (6 produtos).'},
+  {l:'Recebido até 13/08/2026', v:brl0(F1_RECEB),
+   n:'12 dos 14 produtos entregues e pagos. O ERP registra R$ 2.120.000 — divergência de R$ 50.000 a validar.',
+   chip:pct(F1_RECEB,F1_TOT)+' do contratado', chipc:'var(--good)'},
+  {l:'A receber — condicionado a dez/2027', v:brl0(F1_ARECEBER),
+   n:'Produtos 7 (entregas físicas de acessibilidade, R$ 360.000) e 8 (relatório final, R$ 20.000). Se recebido, segue integralmente para a coordenação.',
+   chip:'entrada não garantida', chipc:'var(--warning)'},
+  {l:'Etapa 1 destinada à coordenação', v:brl0(COORD_F1_TOT),
+   n:'R$ 130.000 enviados em 2025, R$ 190.000 a enviar em 2026 e R$ 380.000 condicionados a 2027.'}
+]);
 
-  const pendentes = allItems.filter(i=>!i.pago);
-  const aditivo = DATA.eixos['4º Aditivo de Contrato'];
-  const totalAditivo = aditivo.reduce((s,i)=>s+i.valor,0);
-  const museo = DATA.eixos['Eixo Museológico'];
-  const museoPendFisico = museo.filter(i=>!i.pago).reduce((s,i)=>s+i.valor,0);
-  const maiorPendente = [...pendentes].sort((a,b)=>b.valor-a.valor)[0];
-  const overdue = pendentes.filter(i=>i.prazo && (parseDate(i.prazo) - TODAY) < 0);
-  const overdueTotal = overdue.reduce((s,i)=>s+i.valor,0);
+tiles('tiles-f2',[
+  {l:'Contratado na etapa 2 (4º aditivo)', v:brl0(F2_TOT), n:'Oito parcelas, da 15ª à 22ª, assinadas com base na análise do IDG.'},
+  {l:'Entregue e faturado até 13/08/2026', v:brl0(0), n:'Nenhuma parcela entregue, faturada ou recebida.',
+   chip:'0% executado', chipc:'var(--warning)'},
+  {l:'Previsto entrar em caixa em 2026', v:brl0(F2_CAIXA26), n:'Restante — R$ 435.000 — previsto para 2027. Parcelas com prazo em 2026 somam R$ 455.000.'},
+  {l:'Destinação do recurso', v:'Coordenação', n:'100% do valor recebido é repassado como coordenação geral do IDG. Efeito neutro no caixa do projeto.'}
+]);
 
-  const cards = [
-    {
-      label: 'risco', cls:'risk',
-      title: 'Pendência ligada a obras físicas, fora do controle direto do projeto',
-      body: `<span class="figure">${fmtBRL(museoPendFisico)}</span> do Eixo Museológico está pendente e depende da execução física das obras de acessibilidade — condição que não depende apenas da equipe de consultoria, mas de cronograma de obra civil. Isso inclui as duas entregas já formalmente com prazo vencido (${fmtBRL(overdueTotal)} em atraso desde 12/09/2025).`
-    },
-    {
-      label: 'atenção', cls:'watch',
-      title: 'Duas frentes distintas de prazo indefinido no 4º Aditivo',
-      body: `<span class="figure">15ª e 18ª parcelas</span> (${fmtBRL(75000)}) têm proposta concreta de adiamento por e-mail (06/07/2026) — aguardando apenas confirmação formal da SEDUC. Já <span class="figure">16ª e 17ª parcelas</span> (${fmtBRL(115000)}) seguem sem qualquer retorno nesta rodada; a data original da SEDUC para a 17ª — 30/06/2026 — já teria vencido, e mesmo a versão revisada (31/08/2026) está a poucas semanas. Vale cobrar posição sobre essas duas junto com a resposta pendente das outras.`
-    },
-    {
-      label: 'concentração', cls:'info',
-      title: `Um único entregável concentra ${(maiorPendente.valor/totalPendente*100).toFixed(1)}% do valor pendente`,
-      body: `<span class="figure">${maiorPendente.desc}</span> (${maiorPendente.eixo}, ${fmtBRL(maiorPendente.valor)}) é isoladamente a maior pendência em valor — ${(maiorPendente.valor/totalPendente*100).toFixed(1)}% do total pendente. O 4º Aditivo como um todo (${fmtBRL(totalAditivo)}) está 100% pendente, o que é esperado por ser a frente contratual mais recente.`
-    },
-    {
-      label: 'estabilidade', cls:'ok',
-      title: 'Eixo de Gestão e Governança está com pagamentos em dia',
-      body: `Todos os 6 entregáveis do Eixo Gestão e Governança já foram entregues e pagos (${fmtBRL(970000)}), incluindo os produtos estruturantes de governança, marca e capacitação. É o único eixo com execução financeira de 100%, e serve de referência de ritmo para os demais.`
-    }
-  ];
+tiles('tiles-cons',[
+  {l:'Total contratado nas duas etapas', v:brl0(F1_TOT+F2_TOT),
+   n:'Etapa 1 R$ 2.550.000 + etapa 2 R$ 625.000. Recebido até aqui: R$ 2.170.000.'},
+  {l:'Saldo em caixa projetado para dez/2026', v:brl(SALDO_DEZ),
+   n:'Já considera o repasse de coordenação da etapa 2 no mês de cada recebimento.'},
+  {l:'Recurso dedicado — despesa projetada para 2027', v:brl0(DEDICADO),
+   n:'Ações das fases 1 e 2 já apontadas, ainda sem abertura por rubrica no cronograma financeiro.'},
+  {l:'Saldo livre em dez/2026 — e ao final de 2027', v:brl(LIVRE),
+   n:'Margem efetiva do projeto após a dedicação dos R$ 500.000. Permanece a mesma em 2027, já que as demais entradas são repasse.',
+   chip:pct(LIVRE,SALDO_DEZ)+' do saldo em caixa', chipc:'var(--warning)'},
+  {l:'Coordenação no ciclo 2025–2027', v:brl0(COORD_CICLO),
+   n:'R$ 700.000 com origem na etapa 1 e R$ 625.000 da etapa 2. Enviados até aqui: R$ 130.000.'},
+  {l:'Movimentação do projeto — 2025 e 2026', v:brl(1847323),
+   n:'Despesas: R$ 842.842,04 realizados até jul/2026 + R$ 1.004.480,96 a realizar. Receitas no mesmo período: R$ 2.398.925,75.'}
+]);
 
-  cards.forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'analysis-card';
-    div.innerHTML = `<div class="a-label ${c.cls}">${c.label}</div><h3>${c.title}</h3><p>${c.body}</p>`;
-    container.appendChild(div);
+/* ---------------- tooltip ---------------- */
+function mkTip(host){
+  var t = el('div','tip'); host.appendChild(t);
+  return {
+    show:function(html,x,y){
+      t.innerHTML = html; t.style.opacity = 1;
+      var w = t.offsetWidth, h = t.offsetHeight, hw = host.clientWidth;
+      var left = x + 14; if(left + w > hw - 4) left = x - w - 14; if(left < 2) left = 2;
+      var top = y - h - 12; if(top < 2) top = y + 16;
+      t.style.left = left+'px'; t.style.top = top+'px';
+    },
+    hide:function(){ t.style.opacity = 0; }
+  };
+}
+function tipRow(color,name,val,dash){
+  var mark = color ? (dash
+      ? '<span style="width:14px;border-top:2px dashed '+color+';display:inline-block"></span>'
+      : '<span style="width:10px;height:10px;border-radius:3px;background:'+color+';display:inline-block"></span>')
+    : '';
+  return '<div class="row"><span class="nm">'+mark+name+'</span><span class="vl">'+val+'</span></div>';
+}
+
+/* ---------------- registry ---------------- */
+var charts = [];
+function register(fn){ charts.push(fn); fn(); }
+var rt;
+window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(redrawAll,180); });
+function redrawAll(){ charts.forEach(function(f){ f(); }); }
+function legendInto(id, series){
+  var ul = document.getElementById(id); ul.innerHTML='';
+  series.forEach(function(s){
+    ul.appendChild(el('li',null,'<span class="key" style="background:var('+s.color+')"></span><span>'+s.name+'</span>'));
   });
 }
 
-// ---------- render inicial ----------
-function renderAll(){
-  renderResumo(currentFase);
-  renderFaseRows(currentFase);
-  renderLedger(currentFase, currentStatus);
+/* ============================================================
+   BARRAS HORIZONTAIS EMPILHADAS
+   ============================================================ */
+function hStack(hostId, items, series, opts){
+  opts = opts||{};
+  var host = document.getElementById(hostId); host.innerHTML='';
+  var W = host.clientWidth || 560; if(W<280) W=280;
+  var labelW = Math.min(opts.labelW||220, Math.round(W*0.40));
+  var rowH = opts.rowH || 38;
+  var totals = items.map(function(d){ return d.vals.reduce(function(a,b){return a+b;},0); });
+  var vmaxW = Math.max.apply(null, totals.map(function(v){ return measure(brl0(v),11.5,'600'); }));
+  var M = {t:6, r:Math.ceil(vmaxW)+16, b:6, l:labelW};
+  var H = M.t+M.b+items.length*rowH;
+  var iw = W-M.l-M.r;
+  var maxV = Math.max.apply(null, totals);
+  var bh = Math.min(18, rowH-16);
+  var svg = svgEl('svg',{viewBox:'0 0 '+W+' '+H, width:W, height:H, role:'img','aria-label':opts.aria||''});
+  var tip = mkTip(host);
+  items.forEach(function(d,i){
+    var y = M.t + i*rowH + (rowH-bh)/2;
+    var lt = svgEl('text',{x:M.l-10,y:y+bh/2+4,'text-anchor':'end','font-size':11.5,fill:cssv('--ink2')});
+    lt.textContent = fitText(d.k, labelW-12, 11.5);
+    var ttl = svgEl('title'); ttl.textContent = d.k; lt.appendChild(ttl);
+    svg.appendChild(lt);
+    var acc = 0, segs = [];
+    d.vals.forEach(function(v,si){ if(v>0){ segs.push({si:si, x0:acc, v:v}); acc += v; } });
+    segs.forEach(function(s,k){
+      var x = M.l + iw*s.x0/maxV;
+      var gap = (k < segs.length-1) ? 2 : 0;
+      var w = Math.max(1.5, iw*s.v/maxV - gap);
+      var isLast = (k === segs.length-1);
+      svg.appendChild(svgEl('path',{d:roundRectPath(x,y,w,bh,4,isLast?'right':'square'),
+        fill:cssv(series[s.si].color)}));
+    });
+    var vt = svgEl('text',{x:M.l+iw*totals[i]/maxV+9,y:y+bh/2+4,'font-size':11.5,
+      fill:cssv('--ink'),'font-weight':600});
+    vt.textContent = brl0(totals[i]); svg.appendChild(vt);
+    var hit = svgEl('rect',{x:0,y:M.t+i*rowH,width:W,height:rowH,fill:'transparent'});
+    hit.addEventListener('mousemove',function(ev){
+      var r = svg.getBoundingClientRect();
+      var html = '<div class="tt">'+d.k+'</div>';
+      d.vals.forEach(function(v,si){ if(v>0) html += tipRow(cssv(series[si].color), series[si].name, brl(v)); });
+      html += '<div class="sep"></div>' + tipRow(null,'Total', brl(totals[i]));
+      if(opts.totalRef) html += tipRow(null,'Participação', pct(totals[i],opts.totalRef));
+      tip.show(html, (ev.clientX-r.left), (M.t+i*rowH)*(r.height/H)+rowH);
+    });
+    hit.addEventListener('mouseleave',function(){ tip.hide(); });
+    svg.appendChild(hit);
+  });
+  host.appendChild(svg);
 }
-renderAll();
-renderAnalysis();
 
-// ---------- wiring dos filtros ----------
-document.getElementById('faseFilter').addEventListener('click', (e) => {
-  const btn = e.target.closest('.pill');
-  if(!btn) return;
-  currentFase = btn.dataset.fase;
-  document.querySelectorAll('#faseFilter .pill').forEach(p => p.classList.toggle('active', p === btn));
-  renderAll();
+/* ============================================================
+   COLUNAS VERTICAIS EMPILHADAS
+   ============================================================ */
+function vStack(hostId, cats, series, opts){
+  opts = opts||{};
+  var host = document.getElementById(hostId); host.innerHTML='';
+  var W = host.clientWidth || 640; if(W<300) W=300;
+  if(opts.maxW && W > opts.maxW) W = opts.maxW;
+  var H = opts.H || 300;
+  var M = {t:30,r:16,b:46,l:66};
+  var iw = W-M.l-M.r, ih = H-M.t-M.b;
+  var totals = cats.map(function(c){ return c.vals.reduce(function(a,b){return a+b;},0); });
+  var maxV = niceMax(Math.max.apply(null, totals));
+  var band = iw/cats.length, bw = Math.min(24, band*0.42);
+  var Y = function(v){ return M.t + ih - (ih*v)/maxV; };
+  var svg = svgEl('svg',{viewBox:'0 0 '+W+' '+H, width:W, height:H, role:'img','aria-label':opts.aria||''});
+  var nT=4, k, v, y;
+  for(k=0;k<=nT;k++){
+    v=maxV*k/nT; y=Y(v);
+    svg.appendChild(svgEl('line',{x1:M.l,x2:W-M.r,y1:y,y2:y,stroke:k?cssv('--grid'):cssv('--axis'),'stroke-width':1}));
+    var t=svgEl('text',{x:M.l-10,y:y+4,'text-anchor':'end','font-size':11,fill:cssv('--muted')});
+    t.textContent = k? compact(v):'0'; svg.appendChild(t);
+  }
+  var yl=svgEl('text',{x:M.l-10,y:M.t-12,'text-anchor':'end','font-size':10.5,fill:cssv('--muted')});
+  yl.textContent='R$'; svg.appendChild(yl);
+  var tip = mkTip(host);
+  cats.forEach(function(c,ci){
+    var cx = M.l + band*ci + band/2, acc = 0, segs = [];
+    c.vals.forEach(function(v,si){ if(v>0){ segs.push({si:si,y0:acc,y1:acc+v,v:v}); acc+=v; } });
+    segs.forEach(function(s,k2){
+      var yTop = Y(s.y1), yBot = Y(s.y0);
+      var gap = (k2>0)?2:0;
+      var hh = Math.max(1.5, (yBot-gap)-yTop);
+      var isTop = (k2===segs.length-1);
+      svg.appendChild(svgEl('path',{d:roundRectPath(cx-bw/2,yTop,bw,hh,4,isTop?'top':'square'),
+        fill:cssv(series[s.si].color)}));
+    });
+    var tl = svgEl('text',{x:cx,y:Y(totals[ci])-9,'text-anchor':'middle','font-size':11.5,
+      'font-weight':620,fill:cssv('--ink')});
+    tl.textContent = brl0(totals[ci]); svg.appendChild(tl);
+    var xt = svgEl('text',{x:cx,y:H-M.b+19,'text-anchor':'middle','font-size':11.5,fill:cssv('--muted')});
+    xt.textContent = c.k; svg.appendChild(xt);
+    if(c.sub){
+      var xs = svgEl('text',{x:cx,y:H-M.b+34,'text-anchor':'middle','font-size':10.5,fill:cssv('--muted')});
+      xs.textContent = c.sub; svg.appendChild(xs);
+    }
+    var hit = svgEl('rect',{x:M.l+band*ci,y:M.t,width:band,height:ih,fill:'transparent'});
+    hit.style.cursor='crosshair';
+    hit.addEventListener('mousemove',function(ev){
+      var r = svg.getBoundingClientRect();
+      var html = '<div class="tt">'+c.k+(c.sub?' · '+c.sub:'')+'</div>';
+      c.vals.forEach(function(v,si){ if(v>0) html += tipRow(cssv(series[si].color), series[si].name, brl(v)); });
+      html += '<div class="sep"></div>' + tipRow(null,'Total do ano', brl(totals[ci]));
+      if(c.acum!=null) html += tipRow(null,'Acumulado', brl(c.acum));
+      tip.show(html, (ev.clientX-r.left), Y(totals[ci])*(r.height/H));
+    });
+    hit.addEventListener('mouseleave',function(){ tip.hide(); });
+    svg.appendChild(hit);
+  });
+  host.appendChild(svg);
+}
+
+/* ============================================================
+   ETAPA 1 — execução dos eixos
+   ============================================================ */
+var SER_F1 = [
+  {name:'Recebido', color:'--s1'},
+  {name:'A receber — contingente, dez/2027', color:'--s4'}
+];
+legendInto('l-f1', SER_F1);
+register(function(){
+  hStack('c-f1', [
+    {k:'Eixo Museológico', vals:[1200000, 380000]},
+    {k:'Eixo Gestão e Governança', vals:[970000, 0]}
+  ], SER_F1, {labelW:220, rowH:46, aria:'Execução financeira dos eixos da etapa 1', totalRef:F1_TOT});
 });
 
-document.getElementById('statusFilter').addEventListener('click', (e) => {
-  const btn = e.target.closest('.pill');
-  if(!btn) return;
-  currentStatus = btn.dataset.status;
-  document.querySelectorAll('#statusFilter .pill').forEach(p => p.classList.toggle('active', p === btn));
-  renderLedger(currentFase, currentStatus);
+/* ============================================================
+   COORDENAÇÃO 2025–2027
+   ============================================================ */
+var SER_C = [{name:'Origem: etapa 1', color:'--s1'},{name:'Origem: etapa 2', color:'--s2'}];
+legendInto('l-coord', SER_C);
+register(function(){
+  vStack('c-coord', [
+    {k:'2025', sub:'realizado', vals:[COORD_F1_25, 0], acum:130000},
+    {k:'2026', sub:'a realizar', vals:[COORD_F1_26, F2_CAIXA26], acum:510000},
+    {k:'2027*', sub:'a realizar', vals:[COORD_F1_27, F2_CAIXA27], acum:COORD_CICLO}
+  ], SER_C, {H:300, maxW:640, aria:'Coordenação geral do IDG por ano, 2025 a 2027, por etapa de origem'});
 });
+
+/* ============================================================
+   SALDO ACUMULADO
+   ============================================================ */
+var mensal = D.mensal;
+var CUT = 18; /* jul/2026 */
+
+register(function drawSaldo(){
+  var host = document.getElementById('c-saldo'); host.innerHTML='';
+  var avail = host.parentElement.clientWidth || 900;
+  var W = Math.max(avail, 700), H = 340;
+  var M = {t:22,r:20,b:52,l:66};
+  var iw = W-M.l-M.r, ih = H-M.t-M.b;
+  var pts = mensal.map(function(m,i){ return {i:i, x:0, y:0, v:m.saldo, rot:m.rot, m:m}; });
+  var maxV = niceMax(Math.max.apply(null, pts.map(function(p){return p.v;})));
+  var X = function(i){ return M.l + (iw*i)/(pts.length-1); };
+  var Y = function(v){ return M.t + ih - (ih*v)/maxV; };
+  pts.forEach(function(p){ p.x = X(p.i); p.y = Y(p.v); });
+  var svg = svgEl('svg',{viewBox:'0 0 '+W+' '+H, width:W, height:H, role:'img',
+    'aria-label':'Linha do saldo acumulado do projeto de fevereiro de 2025 a dezembro de 2026'});
+  var nT = 5, k, v, y;
+  for(k=0;k<=nT;k++){
+    v = maxV*k/nT; y = Y(v);
+    svg.appendChild(svgEl('line',{x1:M.l,x2:W-M.r,y1:y,y2:y,stroke:k?cssv('--grid'):cssv('--axis'),'stroke-width':1}));
+    var tx = svgEl('text',{x:M.l-10,y:y+4,'text-anchor':'end','font-size':11,fill:cssv('--muted')});
+    tx.textContent = k? compact(v) : '0'; svg.appendChild(tx);
+  }
+  var yl = svgEl('text',{x:M.l-10,y:M.t-8,'text-anchor':'end','font-size':10.5,fill:cssv('--muted')});
+  yl.textContent='R$'; svg.appendChild(yl);
+
+  var yr = Y(RESERVA_F1);
+  svg.appendChild(svgEl('line',{x1:M.l,x2:W-M.r,y1:yr,y2:yr,stroke:cssv('--warning'),'stroke-width':1.5}));
+  var lab = 'Recurso dedicado a 2027 · ' + brl0(DEDICADO);
+  var lw = measure(lab,10.5)+16;
+  svg.appendChild(svgEl('rect',{x:M.l+6,y:yr-20,width:lw,height:17,rx:5,fill:cssv('--surface'),stroke:cssv('--border')}));
+  var lt = svgEl('text',{x:M.l+14,y:yr-7.5,'font-size':10.5,fill:cssv('--ink2')});
+  lt.textContent = lab; svg.appendChild(lt);
+
+  function pathOf(a,b){
+    var d='';
+    for(var i=a;i<=b;i++){ d += (i===a?'M':'L') + pts[i].x.toFixed(1) + ' ' + pts[i].y.toFixed(1); }
+    return d;
+  }
+  var areaD = pathOf(0, pts.length-1) + 'L'+pts[pts.length-1].x+' '+Y(0)+'L'+pts[0].x+' '+Y(0)+'Z';
+  svg.appendChild(svgEl('path',{d:areaD, fill:cssv('--s1'), 'fill-opacity':0.10, stroke:'none'}));
+  svg.appendChild(svgEl('path',{d:pathOf(0,CUT), fill:'none', stroke:cssv('--s1'),
+    'stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round'}));
+  svg.appendChild(svgEl('path',{d:pathOf(CUT,pts.length-1), fill:'none', stroke:cssv('--s1'),
+    'stroke-width':2,'stroke-dasharray':'6 5','stroke-linecap':'round'}));
+
+  var xc = (pts[CUT].x+pts[CUT+1].x)/2;
+  svg.appendChild(svgEl('line',{x1:xc,x2:xc,y1:M.t,y2:M.t+ih,stroke:cssv('--axis'),'stroke-width':1}));
+  var dt = svgEl('text',{x:xc+6,y:M.t+11,'font-size':10.5,fill:cssv('--muted')});
+  dt.textContent='projetado →'; svg.appendChild(dt);
+
+  pts.forEach(function(p,i){
+    if(i%2!==1) return;
+    var t = svgEl('text',{x:p.x,y:H-M.b+18,'text-anchor':'middle','font-size':10.5,fill:cssv('--muted')});
+    t.textContent = p.rot; svg.appendChild(t);
+  });
+
+  var last = pts[pts.length-1];
+  svg.appendChild(svgEl('circle',{cx:last.x,cy:last.y,r:5,fill:cssv('--s1'),stroke:cssv('--surface'),'stroke-width':2}));
+  var vlab = brl0(last.v), vw = measure(vlab,11.5,'620')+16;
+  var vx = Math.min(last.x-vw/2, W-M.r-vw);
+  svg.appendChild(svgEl('rect',{x:vx,y:last.y-32,width:vw,height:19,rx:5,fill:cssv('--surface'),stroke:cssv('--border')}));
+  var vt = svgEl('text',{x:vx+vw/2,y:last.y-18,'text-anchor':'middle','font-size':11.5,'font-weight':620,fill:cssv('--ink')});
+  vt.textContent = vlab; svg.appendChild(vt);
+
+  host.appendChild(svg);
+
+  var tip = mkTip(host);
+  var hv = svgEl('g',{}); svg.appendChild(hv);
+  var vline = svgEl('line',{y1:M.t,y2:M.t+ih,stroke:cssv('--axis'),'stroke-width':1,opacity:0});
+  var hdot = svgEl('circle',{r:5,fill:cssv('--s1'),stroke:cssv('--surface'),'stroke-width':2,opacity:0});
+  hv.appendChild(vline); hv.appendChild(hdot);
+  var hit = svgEl('rect',{x:M.l,y:M.t,width:iw,height:ih,fill:'transparent'});
+  svg.appendChild(hit);
+  function move(ev){
+    var r = svg.getBoundingClientRect();
+    var sx = (ev.clientX - r.left) * (W/r.width);
+    var idx = Math.round((sx-M.l)/(iw/(pts.length-1)));
+    idx = Math.max(0,Math.min(pts.length-1,idx));
+    var p = pts[idx], m = p.m, proj = idx > CUT;
+    vline.setAttribute('x1',p.x); vline.setAttribute('x2',p.x); vline.setAttribute('opacity',1);
+    hdot.setAttribute('cx',p.x); hdot.setAttribute('cy',p.y); hdot.setAttribute('opacity',1);
+    var html = '<div class="tt">'+m.mes+'/'+m.ano+(proj?' · projetado':' · realizado')+'</div>'
+      + tipRow(cssv('--s1'),'Saldo acumulado',brl(m.saldo),proj)
+      + '<div class="sep"></div>'
+      + tipRow(null,'Receita do mês',brl(m.recT))
+      + tipRow(null,'Despesa do mês',brl(m.despT))
+      + tipRow(null,'Resultado',brl(m.res));
+    tip.show(html, p.x*(r.width/W), p.y*(r.height/H));
+  }
+  hit.addEventListener('mousemove',move);
+  hit.addEventListener('mouseleave',function(){ tip.hide(); vline.setAttribute('opacity',0); hdot.setAttribute('opacity',0); });
+  hit.addEventListener('touchstart',function(e){ move(e.touches[0]); },{passive:true});
+  hit.addEventListener('touchmove',function(e){ move(e.touches[0]); },{passive:true});
+});
+
+/* ============================================================
+   RECEITA x DESPESA MENSAL
+   ============================================================ */
+register(function drawRD(){
+  var host = document.getElementById('c-rd'); host.innerHTML='';
+  var avail = host.parentElement.clientWidth || 900;
+  var W = Math.max(avail, 860), H = 330;
+  var M = {t:18,r:16,b:52,l:66};
+  var iw = W-M.l-M.r, ih = H-M.t-M.b;
+  var n = mensal.length, band = iw/n;
+  var bw = Math.min(11, (band-8)/2);
+  var maxV = niceMax(Math.max.apply(null, mensal.map(function(m){ return Math.max(m.recT,m.despT); })));
+  var Y = function(v){ return M.t + ih - (ih*v)/maxV; };
+  var svg = svgEl('svg',{viewBox:'0 0 '+W+' '+H, width:W, height:H, role:'img',
+    'aria-label':'Colunas de receita e despesa por mês, 2025 e 2026'});
+  var nT=5, k, v, y;
+  for(k=0;k<=nT;k++){
+    v=maxV*k/nT; y=Y(v);
+    svg.appendChild(svgEl('line',{x1:M.l,x2:W-M.r,y1:y,y2:y,stroke:k?cssv('--grid'):cssv('--axis'),'stroke-width':1}));
+    var t=svgEl('text',{x:M.l-10,y:y+4,'text-anchor':'end','font-size':11,fill:cssv('--muted')});
+    t.textContent = k? compact(v):'0'; svg.appendChild(t);
+  }
+  var yl=svgEl('text',{x:M.l-10,y:M.t-4,'text-anchor':'end','font-size':10.5,fill:cssv('--muted')});
+  yl.textContent='R$'; svg.appendChild(yl);
+  var tip = mkTip(host);
+  mensal.forEach(function(m,i){
+    var cx = M.l + band*i + band/2;
+    var proj = i > CUT;
+    [[m.recT,cssv('--s1'),-1],[m.despT,cssv('--s2'),1]].forEach(function(s){
+      if(!s[0]) return;
+      var h = ih*s[0]/maxV; if(h<1.5) h=1.5;
+      var x = s[2]<0 ? cx - bw - 1 : cx + 1;
+      svg.appendChild(svgEl('path',{d:roundRectPath(x, Y(s[0]), bw, h, 4, 'top'), fill:s[1],
+        'fill-opacity': proj?0.55:1}));
+    });
+    var hit = svgEl('rect',{x:M.l+band*i,y:M.t,width:band,height:ih,fill:'transparent'});
+    hit.style.cursor='crosshair';
+    hit.addEventListener('mousemove',function(ev){
+      var r = svg.getBoundingClientRect();
+      var html = '<div class="tt">'+m.mes+'/'+m.ano+(proj?' · projetado':' · realizado')+'</div>'
+        + tipRow(cssv('--s1'),'Receita',brl(m.recT))
+        + tipRow(cssv('--s2'),'Despesa',brl(m.despT))
+        + '<div class="sep"></div>'
+        + tipRow(null,'Resultado',brl(m.res))
+        + tipRow(null,'Saldo acumulado',brl(m.saldo));
+      tip.show(html, (ev.clientX-r.left), Math.min(Y(Math.max(m.recT,m.despT)),ih)*(r.height/H));
+    });
+    hit.addEventListener('mouseleave',function(){ tip.hide(); });
+    svg.appendChild(hit);
+    if(i%2===1){
+      var t=svgEl('text',{x:cx,y:H-M.b+18,'text-anchor':'middle','font-size':10.5,fill:cssv('--muted')});
+      t.textContent=m.rot; svg.appendChild(t);
+    }
+  });
+  var xc = M.l + band*(CUT+1);
+  svg.appendChild(svgEl('line',{x1:xc,x2:xc,y1:M.t,y2:M.t+ih,stroke:cssv('--axis'),'stroke-width':1}));
+  var dt=svgEl('text',{x:xc+6,y:M.t+11,'font-size':10.5,fill:cssv('--muted')});
+  dt.textContent='projetado →'; svg.appendChild(dt);
+  var pk = mensal.reduce(function(a,b){ return b.recT>a.recT?b:a; }, mensal[0]);
+  var pi = mensal.indexOf(pk), px = M.l + band*pi + band/2;
+  var plab = brl0(pk.recT)+' · '+pk.rot, pw = measure(plab,10.5,'600')+16;
+  var bx = Math.max(M.l, Math.min(px-pw/2, W-M.r-pw));
+  svg.appendChild(svgEl('rect',{x:bx,y:Y(pk.recT)-24,width:pw,height:18,rx:5,fill:cssv('--surface'),stroke:cssv('--border')}));
+  var pt=svgEl('text',{x:bx+pw/2,y:Y(pk.recT)-11,'text-anchor':'middle','font-size':10.5,'font-weight':600,fill:cssv('--ink')});
+  pt.textContent=plab; svg.appendChild(pt);
+  host.appendChild(svg);
+});
+
+/* ============================================================
+   GRANDES LINHAS
+   ============================================================ */
+var SER_L = [
+  {name:'Realizado 2025', color:'--s1'},
+  {name:'Realizado 2026 (jan–jul)', color:'--s2'},
+  {name:'A realizar 2026 (ago–dez)', color:'--s3'}
+];
+var linhas = D.linhas.slice().sort(function(a,b){ return b.tot-a.tot; });
+var linhasTot = D.linhasTot, linhasPer = D.linhasPer;
+document.getElementById('despGrandTot').textContent = brl(linhasTot);
+legendInto('l-linhas', SER_L);
+register(function(){
+  hStack('c-linhas', linhas.map(function(d){ return {k:d.k, vals:[d.r2025,d.r2026,d.p2026]}; }), SER_L,
+    {labelW:250, rowH:38, aria:'Despesas por grande linha, realizado e a realizar', totalRef:linhasTot});
+});
+
+/* ============================================================
+   TABELAS
+   ============================================================ */
+function table(hostId, head, rows, foot){
+  var host = document.getElementById(hostId); host.innerHTML='';
+  var t = el('table');
+  var thead = el('thead'), tr = el('tr');
+  head.forEach(function(h){ var th = el('th', h.num?'num':null, h.t); if(h.w) th.style.minWidth=h.w; tr.appendChild(th); });
+  thead.appendChild(tr); t.appendChild(thead);
+  var tb = el('tbody');
+  rows.forEach(function(r){
+    var cells = r.c || r;
+    var trr = el('tr', r.cls||null);
+    cells.forEach(function(c,i){
+      var td = el('td', (head[i]&&head[i].num?'num':null));
+      td.innerHTML = c; trr.appendChild(td);
+    });
+    tb.appendChild(trr);
+  });
+  t.appendChild(tb);
+  if(foot){
+    var tf = el('tbody');
+    foot.forEach(function(r){
+      var trr = el('tr','tot');
+      r.forEach(function(c,i){ var td = el('td', head[i]&&head[i].num?'num':null); td.innerHTML=c; trr.appendChild(td); });
+      tf.appendChild(trr);
+    });
+    t.appendChild(tf);
+  }
+  host.appendChild(t);
+}
+function sgn(v){ return '<span class="'+(v<0?'neg':(v>0?'pos':''))+'">'+brl(v)+'</span>'; }
+function status(txt, color){
+  return '<span class="st"><span class="dot" style="background:'+color+'"></span>'+txt+'</span>';
+}
+
+/* --- etapa 1: eixos --- */
+table('t-f1',
+  [{t:'Eixo'},{t:'Contratado',num:1},{t:'Recebido',num:1},{t:'A receber (contingente)',num:1},{t:'% recebido',num:1}],
+  [
+    ['Eixo Museológico', brl0(1580000), brl0(1200000), brl0(380000), pct(1200000,1580000)],
+    ['Eixo Gestão e Governança', brl0(970000), brl0(970000), '—', '100,0%']
+  ],
+  [['Total da etapa 1', brl0(F1_TOT), brl0(F1_RECEB), brl0(F1_ARECEBER), pct(F1_RECEB,F1_TOT)]]
+);
+
+/* --- etapa 1: produtos --- */
+function prodRows(arr){
+  return arr.map(function(p){
+    var naoEnt = /n[ãa]o\s+entregue/i.test(p.entrega);
+    var pago = /Pago/i.test(p.pag) && !naoEnt;
+    var stEnt = naoEnt ? status('Não entregue', cssv('--warning')) : status(p.entrega, cssv('--good'));
+    var stPag = pago ? status('Pago', cssv('--good')) : status('Pendente', cssv('--warning'));
+    var receb = /\d{2}\/\d{2}\/\d{4}/.test(p.receb) ? p.receb
+              : '<span style="color:var(--muted)">'+(p.obs? p.obs : 'não recebido')+'</span>';
+    return [p.prod, p.desc, p.prazo, stEnt, stPag, brl0(p.v), receb];
+  });
+}
+var HEAD_P = [{t:'Nº'},{t:'Produto',w:'220px'},{t:'Prazo SIGOEI'},{t:'Entrega'},{t:'Pagamento'},
+              {t:'Valor',num:1},{t:'Recebimento'}];
+table('t-museo', HEAD_P, prodRows(D.museo),
+  [['','','','','Total', brl0(1580000), 'Recebido: '+brl0(1200000)]]);
+table('t-gestao', HEAD_P, prodRows(D.gestao),
+  [['','','','','Total', brl0(970000), 'Recebido: '+brl0(970000)]]);
+
+/* --- etapa 1: coordenação --- */
+table('t-f1coord',
+  [{t:'Momento'},{t:'Valor',num:1},{t:'Situação'}],
+  [
+    ['Enviado em agosto/2025', brl0(COORD_F1_25), status('Realizado', cssv('--s1'))],
+    ['A enviar em agosto/2026', brl0(COORD_F1_26), status('A realizar', cssv('--s3'))],
+    ['A enviar em 2027, se os produtos 7 e 8 forem recebidos', brl0(COORD_F1_27),
+     status('Condicionado', cssv('--warning'))]
+  ],
+  [['Total da etapa 1 destinado à coordenação', brl0(COORD_F1_TOT), '']]
+);
+
+/* --- etapa 1: reserva --- */
+table('t-f1res',
+  [{t:'Item'},{t:'Valor',num:1}],
+  [
+    ['Recebido da etapa 1 até 13/08/2026', brl0(F1_RECEB)],
+    ['(−) Coordenação com origem na etapa 1 em 2025 e 2026', brlNeg(COORD_F1)],
+    ['(=) <strong>Aplicado na execução do projeto</strong>', '<strong>'+brl0(APLICADO_F1)+'</strong>']
+  ],
+  [['A receber em 2027 — integralmente destinado à coordenação', brl0(F1_ARECEBER)]]
+);
+
+/* --- etapa 2: parcelas --- */
+table('t-fase2',
+  [{t:'Parcela'},{t:'Entrega',w:'260px'},{t:'Prazo'},{t:'Situação'},{t:'Valor',num:1},{t:'Ano do prazo',num:1}],
+  D.fase2.map(function(p){
+    var ano = (p.prazo.match(/(\d{4})/)||[])[1] || '';
+    var nome = p.prod.replace(/\*+$/,'').replace(/^(\d+)a Parcela$/,'$1ª parcela');
+    return ['<span style="white-space:nowrap">'+nome+'</span>', p.desc, p.prazo.replace(/\*+$/,'*'),
+            status('Não entregue', cssv('--warning')), brl0(p.v), ano];
+  }),
+  [['Subtotal com prazo em 2026 (15ª a 20ª)','','','', brl0(F2_PRAZO26), '2026'],
+   ['Subtotal com prazo em 2027 (21ª e 22ª)','','','', brl0(F2_PRAZO27), '2027'],
+   ['Total do 4º aditivo','','','', brl0(F2_TOT), '']]
+);
+
+/* --- etapa 2: coordenação --- */
+table('t-f2coord',
+  [{t:'Período'},{t:'Entrada',num:1},{t:'Repasse de coordenação',num:1},{t:'Efeito no caixa',num:1}],
+  [
+    ['2026 (out, nov e dez)', brl0(F2_CAIXA26), brlNeg(F2_CAIXA26), brl0(0)],
+    ['2027', brl0(F2_CAIXA27), brlNeg(F2_CAIXA27), brl0(0)]
+  ],
+  [['Total do 4º aditivo', brl0(F2_TOT), brlNeg(F2_TOT), brl0(0)]]
+);
+
+/* --- etapa 2: prazos x caixa --- */
+table('t-f2prazo',
+  [{t:'Ano'},{t:'Prazo de entrega',num:1},{t:'Previsão de entrada em caixa',num:1}],
+  [
+    ['2026', brl0(F2_PRAZO26)+'  <span style="color:var(--muted)">(6 parcelas)</span>', brl0(F2_CAIXA26)],
+    ['2027', brl0(F2_PRAZO27)+'  <span style="color:var(--muted)">(2 parcelas)</span>', brl0(F2_CAIXA27)]
+  ],
+  [['Total', brl0(F2_TOT), brl0(F2_TOT)]]
+);
+
+/* --- coordenação consolidada --- */
+table('t-coord',
+  [{t:'Ano'},{t:'Etapa 1',num:1},{t:'Etapa 2',num:1},{t:'Total no ano',num:1},{t:'Acumulado',num:1},{t:'Situação'}],
+  [
+    ['2025', brl0(COORD_F1_25), '—', brl0(COORD_F1_25), brl0(130000), status('Realizado', cssv('--s1'))],
+    ['2026', brl0(COORD_F1_26), brl0(F2_CAIXA26), brl0(COORD_F1_26+F2_CAIXA26), brl0(510000),
+     status('A realizar', cssv('--s3'))],
+    ['2027', brl0(COORD_F1_27), brl0(F2_CAIXA27), brl0(COORD_F1_27+F2_CAIXA27), brl0(COORD_CICLO),
+     status('A realizar · R$ 380.000 condicionados', cssv('--warning'))]
+  ],
+  [['Total do ciclo', brl0(COORD_F1_TOT), brl0(F2_TOT), brl0(COORD_CICLO), brl0(COORD_CICLO), '']]
+);
+
+/* --- grandes linhas --- */
+table('t-linhas',
+  [{t:'Grande linha'},{t:'Realizado 2025',num:1},{t:'Realizado 2026 (jan–jul)',num:1},
+   {t:'A realizar 2026 (ago–dez)',num:1},{t:'Total',num:1},{t:'%',num:1}],
+  linhas.map(function(d){
+    return [d.k, brl(d.r2025), brl(d.r2026), brl(d.p2026), brl(d.tot), pct(d.tot,linhasTot)];
+  }),
+  [['Total', brl(linhasPer[0]), brl(linhasPer[1]), brl(linhasPer[2]), brl(linhasTot), '100,0%']]
+);
+
+/* --- composição --- */
+var SIGLAS = {'ISS':1,'COFINS':1,'INSS':1,'FGTS':1,'IRRF':1,'PIS':1,'IOF':1,'IDG':1,'IR':1,'CSLL':1,
+  'PCMSO':1,'PPRA':1,'MJB':1};
+var RUB = {
+  'SERV PESQUISA PESQUISAD. CIENTÍFICOS':'Pesquisa — pesquisadores científicos',
+  'SERV. REDAÇÃO REVISÃO EDI DE TEXTOS':'Redação, revisão e edição de textos',
+  'SERV. PROGRAMAÇÃO VISUAL':'Programação visual',
+  'SERV. CURADORIA':'Curadoria',
+  'SERV. PRODUÇÃO DE VIDEO':'Produção de vídeo',
+  'SERV. COORDENAÇÃO GERAL (IDG)':'Coordenação geral do IDG (etapa 1)',
+  'SERV. ASSESSORIA CONTÁBIL':'Assessoria contábil',
+  'SERVIÇO DE BUFFET E COFFEE BREAK':'Buffet e coffee break',
+  'SERVIÇOS TÉCNICOS ESPECIALIZADOS':'Serviços técnicos especializados',
+  'SERV. PCMSO / PPRA / O. DE NATUREZA':'PCMSO / PPRA e afins',
+  'SERV. PCMSO / PPRA / O. NATUREZA':'PCMSO / PPRA e afins',
+  'REEMB. DESPESAS ENTRE PROJETOS-MATRIZ':'Reembolso de despesas entre projetos (matriz)',
+  'REEMBOLSO DE DESPESA MJB':'Reembolso de despesa MJB',
+  'IR S/ APLICAÇÃO FINANCEIRA':'IR sobre aplicação financeira',
+  'Ticket Flex - Alimentação/Refeição':'Vale alimentação (Ticket Flex)',
+  'PROVISAO 13°':'Provisão de 13º salário',
+  '13° SALÁRIO':'13º salário',
+  'PIS FOLHA DE SALARIO':'PIS sobre folha',
+  'IRRF FOLHA':'IRRF sobre folha',
+  'INSS FOLHA':'INSS sobre folha',
+  'FGTS FOLHA':'FGTS sobre folha',
+  'SALARIO':'Salários',
+  'COFINS A RECOLHER':'COFINS a recolher',
+  'PIS/COFINS/CSLL A RECOLHER':'PIS/COFINS/CSLL a recolher',
+  'TAXI E SIMILARES':'Táxi e similares',
+  'DESP COM ESTACIONAMENTO E PEDAGIOS':'Estacionamento e pedágios',
+  'Diária de Viagem':'Diárias de viagem',
+  'Consultoria Especializada':'Consultoria especializada',
+  'Produção de Video':'Produção de vídeo',
+  'Produção Artística':'Produção artística',
+  'Despesas Tributárias':'Despesas tributárias',
+  'Táxi e Similares':'Táxi e similares',
+  'Plano de Saúde':'Plano de saúde',
+  'Coordenação IDG':'Coordenação geral do IDG (etapa 1)',
+  'ISS':'ISS sobre a receita'
+};
+var MINUS = {'E':1,'DE':1,'DA':1,'DO':1,'DAS':1,'DOS':1,'A':1,'O':1,'EM':1,'COM':1,'SOBRE':1,'S/':1,'P/':1};
+function rubrica(s){
+  var t = s.replace(/\s*[\[(](CR|SR)[\])]\s*/g,' ').replace(/\s+/g,' ').trim();
+  if(RUB[t]) return RUB[t];
+  var words = t.split(' ').map(function(w,i){
+    var bare = w.replace(/[.,]/g,'');
+    if(SIGLAS[bare]) return w;
+    if(i>0 && MINUS[bare]) return w.toLocaleLowerCase('pt-BR');
+    if(/[A-ZÁÂÃÀÉÊÍÓÔÕÚÇ]{2,}/.test(w)){
+      var low = w.toLocaleLowerCase('pt-BR');
+      return i===0 ? low.charAt(0).toLocaleUpperCase('pt-BR')+low.slice(1) : low;
+    }
+    return i===0 ? w.charAt(0).toLocaleUpperCase('pt-BR')+w.slice(1) : w;
+  });
+  return words.join(' ');
+}
+(function(){
+  var rows = [];
+  linhas.forEach(function(L){
+    rows.push({cls:'grp', c:['<strong>'+L.k+'</strong>','<strong>'+brl(L.tot)+'</strong>','']});
+    L.det.slice().sort(function(a,b){ return b.v-a.v; }).forEach(function(d){
+      var proj = d.k.indexOf('[projetado] ')===0;
+      var nome = rubrica(proj ? d.k.replace('[projetado] ','') : d.k);
+      rows.push([nome, brl(d.v),
+        proj ? status('A realizar (ago–dez/26)', cssv('--s3')) : status('Realizado', cssv('--s1'))]);
+    });
+  });
+  table('t-linhasdet', [{t:'Rubrica'},{t:'Valor',num:1},{t:'Situação'}], rows,
+    [['Total geral', brl(linhasTot), '']]);
+})();
+
+/* --- recurso dedicado --- */
+table('t-dedicado',
+  [{t:'Aspecto',w:'190px'},{t:'Leitura'}],
+  [
+    ['Valor', '<strong>'+brl0(DEDICADO)+'</strong>'],
+    ['Onde está', 'Em caixa na conta do projeto ao final de 2026.'],
+    ['Destinação', 'Ações das fases 1 e 2 ainda não detalhadas no cronograma financeiro — '
+      + 'a dedicação do recurso já está apontada.'],
+    ['Reconhecimento no fluxo', 'Despesa projetada para 2027. '+status('A realizar em 2027', cssv('--s3'))],
+    ['Efeito no saldo livre', 'Já descontado: o saldo livre de <strong>'+brl(LIVRE)
+      +'</strong> é o valor que sobra depois desta dedicação.']
+  ]
+);
+
+/* --- saldo livre --- */
+table('t-livre', [{t:'Componente'},{t:'Valor',num:1}],
+  [
+    ['Saldo projetado no orçamento aprovado (ago–dez/2026)', brl(SALDO_ORC)],
+    ['(−) Repasse de coordenação da etapa 2 sobre os recebimentos de 2026', brlNeg(F2_CAIXA26)],
+    ['(=) <strong>Saldo em caixa projetado para dez/2026</strong>', '<strong>'+brl(SALDO_DEZ)+'</strong>'],
+    ['(−) Recurso dedicado a ações das fases 1 e 2 (despesa projetada para 2027)', brlNeg(DEDICADO)],
+    ['(=) <strong>Saldo livre, não comprometido</strong>', '<strong>'+brl(LIVRE)+'</strong>'],
+    {cls:'grp', c:['Fora do saldo acima — entram e saem como repasse','']},
+    ['Etapa 1 — a receber em dez/2027 (condicionado), com repasse integral à coordenação', brl0(F1_ARECEBER)],
+    ['Etapa 2 — a receber em 2027, com repasse integral à coordenação', brl0(F2_CAIXA27)]
+  ]
+);
+
+/* --- 2027 --- */
+table('t-2027', [{t:'Item'},{t:'Valor',num:1}],
+  [
+    {cls:'grp', c:['Entradas previstas','']},
+    ['Etapa 2 — saldo do 4º aditivo', brl0(F2_CAIXA27)],
+    ['Etapa 1 — produtos 7 e 8 (condicionado)', brl0(F1_ARECEBER)],
+    ['Subtotal de entradas', brl0(F2_CAIXA27+F1_ARECEBER)],
+    {cls:'grp', c:['Saídas previstas','']},
+    ['Coordenação — repasse da etapa 2', brlNeg(F2_CAIXA27)],
+    ['Coordenação — repasse dos produtos 7 e 8 da etapa 1', brlNeg(F1_ARECEBER)],
+    ['Ações das fases 1 e 2 — uso do recurso dedicado', brlNeg(DEDICADO)],
+    ['Subtotal de saídas', brlNeg(F2_CAIXA27+F1_ARECEBER+DEDICADO)],
+    {cls:'grp', c:['Resultado','']},
+    ['Resultado do ano', brlNeg(DEDICADO)],
+    ['<strong>Saldo em caixa projetado para dez/2027</strong>', '<strong>'+brl(SALDO_DEZ27)+'</strong>']
+  ],
+  [['Se os R$ 380.000 não entrarem, o repasse também não ocorre — resultado idêntico',
+    brl(SALDO_DEZ27)]]
+);
+
+/* --- orçamento projetado --- */
+var projTotalGeral = D.projTotal.reduce(function(a,b){return a+b;},0);
+document.getElementById('projTot').textContent = brl(projTotalGeral);
+(function(){
+  var rows = D.proj.slice().sort(function(a,b){
+    var ta=a.vals.reduce(function(x,y){return x+y;},0), tb=b.vals.reduce(function(x,y){return x+y;},0);
+    return tb-ta;
+  }).map(function(r){
+    var tot = r.vals.reduce(function(a,b){return a+b;},0);
+    return [rubrica(r.conta)+' <span style="color:var(--muted)">· '+r.projeto+'</span>']
+      .concat(r.vals.map(function(v){ return v? brl(v):'—'; })).concat([brl(tot)]);
+  });
+  table('t-proj',
+    [{t:'Rubrica'},{t:'Ago/26',num:1},{t:'Set/26',num:1},{t:'Out/26',num:1},{t:'Nov/26',num:1},
+     {t:'Dez/26',num:1},{t:'Total',num:1}],
+    rows,
+    [['Total geral'].concat(D.projTotal.map(brl)).concat([brl(projTotalGeral)])]
+  );
+})();
+
+/* --- fluxo mensal --- */
+table('t-saldo',
+  [{t:'Mês'},{t:'Situação'},{t:'Receita',num:1},{t:'Despesa',num:1},{t:'Resultado',num:1},{t:'Saldo acumulado',num:1}],
+  mensal.map(function(m,i){ return [m.mes+'/'+m.ano, i>CUT?'Projetado':'Realizado', brl(m.recT), brl(m.despT), sgn(m.res), brl(m.saldo)]; })
+);
+table('t-rd',
+  [{t:'Mês'},{t:'Situação'},{t:'Receita',num:1},{t:'Despesa',num:1},{t:'Resultado',num:1}],
+  mensal.map(function(m,i){ return [m.mes+'/'+m.ano, i>CUT?'Projetado':'Realizado', brl(m.recT), brl(m.despT), sgn(m.res)]; }),
+  [['Total 2025+2026','', brl(D.totais.recT), brl(D.totais.despT), sgn(D.totais.recT-D.totais.despT)]]
+);
+(function(){
+  var rows = [];
+  [2025,2026].forEach(function(y){
+    var sub = y===2025? D.tot2025 : D.tot2026;
+    rows.push({cls:'grp', c:['<strong>'+y+'</strong>','','','','','','','']});
+    mensal.filter(function(m){return m.ano===y;}).forEach(function(m){
+      var gi = mensal.indexOf(m);
+      rows.push([m.mes, gi>CUT?'Projetado':'Realizado',
+        m.recR?brl(m.recR):'—', m.recP?brl(m.recP):'—',
+        m.despR?brl(m.despR):'—', m.despP?brl(m.despP):'—',
+        sgn(m.res), brl(m.saldo)]);
+    });
+    rows.push({cls:'grp', c:['<strong>Subtotal '+y+'</strong>','','<strong>'+brl(sub.recT)+'</strong>','',
+      '<strong>'+brl(sub.despT)+'</strong>','','<strong>'+sgn(sub.res)+'</strong>','']});
+  });
+  table('t-fluxo',
+    [{t:'Mês'},{t:'Situação'},{t:'Receita realizada',num:1},{t:'Receita projetada',num:1},
+     {t:'Despesa realizada',num:1},{t:'Despesa projetada',num:1},{t:'Resultado',num:1},{t:'Saldo acumulado',num:1}],
+    rows,
+    [['Total 2025+2026','',brl(D.totais.recR),brl(D.totais.recP),brl(D.totais.despR),brl(D.totais.despP),
+      sgn(SALDO_DEZ),brl(SALDO_DEZ)]]
+  );
+})();
+
+/* --- receitas --- */
+var recTotal = D.recCat.reduce(function(a,b){return a+b.v;},0);
+document.getElementById('recTot').textContent = brl(recTotal);
+function cliNome(c){
+  return c.replace('ORGANIZAÇÃO DOS ESTADOS IBERO AMERICANOS','Organização dos Estados Ibero-Americanos (OEI)')
+          .replace('ITAÚ UNIBANCO S.A','Itaú Unibanco')
+          .replace('INSTITUTO DE DESENVILVIMENTO E GESTÃO','Instituto de Desenvolvimento e Gestão (IDG)');
+}
+table('t-recdet', [{t:'Recebimento'},{t:'Cliente / origem'},{t:'Categoria'},{t:'Valor',num:1}],
+  D.recRows.map(function(r){ return [r.dt, cliNome(r.cli), r.cat, brl(r.v)]; }),
+  [['Total','','',brl(recTotal)]]
+);
+table('t-recpend', [{t:'Emissão'},{t:'Cliente'},{t:'Título'},{t:'Valor',num:1},{t:'Status'}],
+  D.recCanceladas.map(function(r){
+    return [r.dt, cliNome(r.cli), r.titulo, brl(r.v),
+      status(r.status, r.status==='Cancelado'? cssv('--critical') : cssv('--warning'))];
+  })
+);
+
+/* ---------------- tema ---------------- */
+var btn = document.getElementById('themeBtn');
+function currentDark(){
+  var s = document.documentElement.getAttribute('data-theme');
+  if(s) return s==='dark';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+function syncBtn(){ btn.textContent = currentDark()? 'Modo claro' : 'Modo escuro'; }
+btn.addEventListener('click', function(){
+  document.documentElement.setAttribute('data-theme', currentDark()? 'light':'dark');
+  syncBtn(); redrawAll();
+});
+syncBtn();
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){
+  if(!document.documentElement.getAttribute('data-theme')){ syncBtn(); redrawAll(); }
+});
+document.querySelectorAll('details.tv').forEach(function(d){
+  d.addEventListener('toggle', function(){ setTimeout(redrawAll, 30); });
+});
+})();
 </script>
 </body>
 </html>
