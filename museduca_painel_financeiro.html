@@ -3,1042 +3,813 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MUSEDUCA — Painel Financeiro</title>
+<title>MUSEDUCA · Painel Financeiro</title>
 <style>
-  :root{
-    --bg: #45494f;
-    --bg-panel: #4d525a;
-    --bg-raised: #565b64;
-    --bg-raised-2: #61666f;
-    --border: #6c7178;
-    --border-soft: #5c616a;
-    --text: #ffffff;
-    --text-muted: #d3d6da;
-    --text-dim: #a3a8ae;
-    --paid: #e0b93a;
-    --paid-soft: rgba(224,185,58,0.22);
-    --pending: #f0a04b;
-    --pending-soft: rgba(240,160,75,0.2);
-    --danger: #d9635a;
-    --danger-soft: rgba(217,99,90,0.22);
-    --info: #cfd6a8;
-    --status-paid: #6fa8dc;
-    --status-ontime: #7dc383;
-    --status-overdue: #e0645c;
-    --status-review: #e0b93a;
-    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif;
-    --mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
-    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  }
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
-  *{ box-sizing: border-box; }
+:root{
+  --bg-deep:#EAF3FC; --bg-panel:#DCEBFA; --bg-panel-2:#CFE3F7; --bg-card:#F6FAFE;
+  --line:#B7D3EE; --line-soft:#CFE3F7;
+  --river:#0C8C82; --sand:#375D91; --gold:#A9750F; --rust:#C94A32;
+  --s-rec:#00978A; --s-desp:#3560B0;
+  --ok:#2E7D4F; --warn:#B26A00; --late:#C0392B; --paid:#0C8C82;
+  --text:#16233F; --text-mut:#48607F; --text-dim:#6A83A6;
+  --radius:10px;
+  --serif:'Fraunces', Georgia, serif;
+  --sans:'IBM Plex Sans', system-ui, sans-serif;
+  --mono:'IBM Plex Mono', ui-monospace, monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(ellipse 1200px 600px at 15% -10%, rgba(12,140,130,0.08), transparent 60%),
+    radial-gradient(ellipse 900px 500px at 100% 0%, rgba(232,184,75,0.05), transparent 55%),
+    var(--bg-deep);
+  color:var(--text); font-family:var(--sans); min-height:100vh; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1240px; margin:0 auto; padding:28px 24px 80px;}
+@media (max-width:620px){ .wrap{padding:20px 16px 60px;} }
 
-  html,body{
-    margin:0; padding:0;
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    -webkit-font-smoothing: antialiased;
-  }
+/* ===== MASTHEAD ===== */
+header.masthead{display:flex; justify-content:space-between; align-items:flex-end; gap:24px; padding-bottom:22px; margin-bottom:26px; border-bottom:1px solid var(--line); flex-wrap:wrap;}
+.brand-eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--river); margin-bottom:8px; display:flex; align-items:center; gap:8px;}
+.brand-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--gold); box-shadow:0 0 8px var(--gold);}
+h1.title{font-family:var(--serif); font-weight:600; font-size:38px; line-height:1.05; margin:0; letter-spacing:-.01em;}
+h1.title em{font-style:italic; font-weight:300; color:var(--sand);}
+h1.title .yrs{font-size:.42em; font-weight:500; color:var(--text-mut); font-family:var(--mono); vertical-align:middle; margin-left:6px;}
+.subtitle{color:var(--text-mut); font-size:14px; margin-top:8px; max-width:600px; line-height:1.5;}
+.meta-box{font-family:var(--mono); padding:14px 18px; border:1px solid var(--line); border-radius:var(--radius); background:linear-gradient(180deg,var(--bg-panel-2),var(--bg-panel)); min-width:230px; text-align:right;}
+.meta-box .label{font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim);}
+.meta-box .num{font-size:24px; color:var(--gold); font-weight:600; line-height:1.2; margin:2px 0;}
+.meta-box .sub{font-size:11px; color:var(--text-mut);}
+@media (max-width:620px){ h1.title{font-size:30px;} .meta-box{text-align:left; width:100%;} }
 
-  body{
-    background-image:
-      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(224,185,58,0.10), transparent),
-      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(240,160,75,0.05), transparent);
-    background-attachment: fixed;
-  }
+/* ===== FILTER ===== */
+.filter-bar{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px; position:sticky; top:0; z-index:20; padding:10px 0; background:linear-gradient(180deg,var(--bg-deep) 70%,rgba(234,243,252,0));}
+.pill{font-family:var(--mono); font-size:12.5px; padding:9px 18px; border-radius:999px; border:1px solid var(--line); background:var(--bg-card); color:var(--text-mut); cursor:pointer; transition:all .15s ease;}
+.pill:hover{border-color:var(--river); color:var(--text);}
+.pill.active{background:var(--river); border-color:var(--river); color:#fff; font-weight:600;}
+.pill small{opacity:.75; margin-left:6px;}
+@media (max-width:620px){ .filter-bar{position:static; flex-wrap:nowrap; overflow-x:auto;} .pill{padding:8px 12px; font-size:11.5px; white-space:nowrap;} .pill small{display:none;} }
 
-  .wrap{
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 48px 28px 100px;
-  }
+/* ===== SECTIONS ===== */
+section{margin-bottom:46px;}
+.section-head{display:flex; align-items:baseline; gap:14px; margin-bottom:6px;}
+.section-num{font-family:var(--mono); font-size:12px; color:var(--river); font-weight:600;}
+.section-head h2{font-family:var(--serif); font-weight:500; font-size:24px; margin:0;}
+.section-head .rule{flex:1; height:1px; background:var(--line);}
+.section-desc{font-size:13px; color:var(--text-mut); margin:0 0 18px; line-height:1.55; max-width:860px;}
 
-  /* ===== HEADER ===== */
-  .masthead{
-    display:flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 24px;
-    padding-bottom: 22px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 40px;
-    flex-wrap: wrap;
-  }
-  .masthead-eyebrow{
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 10px;
-  }
-  .masthead h1{
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: 34px;
-    letter-spacing: 0.01em;
-    margin: 0 0 8px;
-    color: var(--text);
-  }
-  .masthead p{
-    font-size: 14px;
-    color: var(--text-muted);
-    max-width: 560px;
-    line-height: 1.5;
-    margin: 0;
-  }
-  .masthead-meta{
-    text-align: right;
-    font-family: var(--mono);
-    font-size: 11.5px;
-    color: var(--text-dim);
-    line-height: 1.9;
-  }
-  .masthead-meta b{ color: var(--text-muted); font-weight: 500; }
+.card{background:var(--bg-card); border:1px solid var(--line); border-radius:var(--radius);}
 
-  section{ margin-bottom: 56px; }
-  .section-head{
-    display:flex;
-    align-items: baseline;
-    gap: 14px;
-    margin-bottom: 22px;
-  }
-  .section-num{
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--text-dim);
-    letter-spacing: 0.05em;
-  }
-  .section-head h2{
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: 20px;
-    margin: 0;
-    color: var(--text);
-  }
-  .section-head .rule{
-    flex: 1;
-    height: 1px;
-    background: var(--border-soft);
-  }
+/* ===== KPIs ===== */
+.kpi-grid{display:grid; grid-template-columns:repeat(3,1fr) 230px; gap:12px;}
+@media (max-width:960px){ .kpi-grid{grid-template-columns:1fr 1fr;} }
+@media (max-width:520px){ .kpi-grid{grid-template-columns:1fr;} }
+.kpi{padding:18px 20px; display:flex; flex-direction:column; justify-content:space-between; min-height:130px;}
+.kpi .k-label{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:12px;}
+.kpi .k-val{font-family:var(--mono); font-size:26px; font-weight:600; letter-spacing:-.01em;}
+.kpi .k-val.rec{color:var(--river);}
+.kpi .k-val.pend{color:var(--gold);}
+.kpi .k-sub{font-family:var(--mono); font-size:11.5px; color:var(--text-mut); margin-top:6px; line-height:1.5;}
+.kpi .k-split{display:flex; height:6px; border-radius:3px; overflow:hidden; margin-top:10px; gap:2px; background:transparent;}
+.kpi .k-split span{display:block; height:100%; border-radius:2px;}
+.gauge-card{display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px;}
+.gauge-cap{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-dim); text-align:center; margin-top:2px;}
 
-  /* ===== RESUMO EXECUTIVO ===== */
-  .resumo-grid{
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 220px;
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-  }
-  @media (max-width: 900px){
-    .resumo-grid{ grid-template-columns: 1fr 1fr; }
-  }
-  .stat-card{
-    background: var(--bg-panel);
-    padding: 24px 22px;
-    display:flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 128px;
-  }
-  .stat-label{
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 14px;
-  }
-  .stat-value{
-    font-family: var(--mono);
-    font-size: 27px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-  }
-  .stat-value.paid{ color: var(--paid); }
-  .stat-value.pending{ color: var(--pending); }
-  .stat-sub{
-    font-size: 12px;
-    color: var(--text-dim);
-    margin-top: 6px;
-    font-family: var(--mono);
-  }
+.fase-strip{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;}
+@media (max-width:760px){ .fase-strip{grid-template-columns:1fr;} }
+.fase-card{padding:16px 18px; cursor:pointer; transition:border-color .15s, opacity .15s;}
+.fase-card:hover{border-color:var(--river);}
+.fase-card.dim{opacity:.45;}
+.fase-card.sel{border-color:var(--river); box-shadow:0 0 0 1px var(--river) inset;}
+.fase-top{display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap;}
+.fase-tag{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--river); font-weight:600;}
+.fase-name{font-family:var(--serif); font-size:17px; margin:4px 0 10px;}
+.fase-pct{font-family:var(--mono); font-size:20px; font-weight:600;}
+.track{height:12px; border-radius:6px; background:var(--bg-panel-2); overflow:hidden; display:flex; gap:2px;}
+.track span{display:block; height:100%;}
+.fase-fig{display:flex; justify-content:space-between; font-family:var(--mono); font-size:11.5px; color:var(--text-mut); margin-top:8px; flex-wrap:wrap; gap:6px;}
+.fase-fig b{font-weight:600; color:var(--text);}
 
-  .seal-card{
-    background: var(--bg-panel);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    padding: 18px;
-  }
-  .seal-pct{
-    font-family: var(--mono);
-    font-size: 12px;
-    fill: var(--text);
-  }
-  .seal-caption{
-    font-family: var(--mono);
-    font-size: 9.5px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-top: 10px;
-    text-align: center;
-  }
+/* ===== TABLES ===== */
+.table-wrap{overflow-x:auto;}
+table.fin{width:100%; border-collapse:collapse; font-size:13px; min-width:720px;}
+table.fin th{font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); text-align:right; padding:11px 12px; border-bottom:1px solid var(--line); background:var(--bg-panel); font-weight:500; white-space:nowrap;}
+table.fin th:first-child{text-align:left;}
+table.fin td{padding:10px 12px; border-bottom:1px solid var(--line-soft); text-align:right; font-family:var(--mono); font-size:12.5px; white-space:nowrap;}
+table.fin td:first-child{text-align:left; font-family:var(--sans); font-size:13px; white-space:normal;}
+table.fin tr.l0 td{background:#EEF5FD; font-weight:600;}
+table.fin tr.l0 td:first-child{font-family:var(--serif); font-size:14.5px; font-weight:500;}
+table.fin tr.l1 td:first-child{padding-left:34px;}
+table.fin tr.l2 td{color:var(--text-mut); font-size:12px;}
+table.fin tr.l2 td:first-child{padding-left:58px; font-size:12.5px;}
+table.fin tr.total td{background:var(--bg-panel-2); font-weight:700; border-top:1px solid var(--line);}
+table.fin tr.total td:first-child{font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase;}
+table.fin td.neg{color:var(--late);}
+table.fin td.pos{color:var(--river);}
+table.fin td.dim{color:var(--text-dim);}
+table.fin td.proj{font-style:italic; color:var(--text-mut);}
+.tg{display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:5px; border:1px solid var(--line); background:var(--bg-card); color:var(--river); font-family:var(--mono); font-size:13px; cursor:pointer; margin-right:8px; vertical-align:middle; padding:0; line-height:1;}
+.tg:hover{background:var(--bg-panel);}
+.tg.open{background:var(--river); color:#fff; border-color:var(--river);}
+.tg-spacer{display:inline-block; width:28px;}
+.chip{display:inline-block; font-family:var(--mono); font-size:10px; padding:2px 7px; border-radius:4px; letter-spacing:.03em; white-space:nowrap; vertical-align:middle; margin-left:6px;}
+.chip.rec{background:rgba(12,140,130,.12); color:var(--river); border:1px solid rgba(12,140,130,.35);}
+.chip.prev{background:rgba(169,117,15,.10); color:var(--gold); border:1px solid rgba(169,117,15,.35);}
+.chip.risk{background:rgba(192,57,43,.10); color:var(--late); border:1px solid rgba(192,57,43,.35);}
+.chip.neu{background:var(--bg-panel); color:var(--text-mut); border:1px solid var(--line);}
+.note-row td{font-family:var(--sans)!important; font-size:12px!important; color:var(--text-mut); white-space:normal!important; text-align:left!important; background:#FBF7EC; font-style:italic;}
 
-  /* ===== VISÃO POR FASE ===== */
-  .fase-row{
-    display: grid;
-    grid-template-columns: 240px 1fr 260px;
-    gap: 20px;
-    align-items: center;
-    padding: 22px 24px;
-    background: var(--bg-panel);
-    border: 1px solid var(--border);
-  }
-  .fase-row + .fase-row{ border-top: none; margin-top: -1px; }
-  @media (max-width: 760px){
-    .fase-row{ grid-template-columns: 1fr; gap: 10px; }
-  }
-  .fase-name{
-    font-family: var(--serif);
-    font-size: 18px;
-    color: var(--text);
-  }
-  .fase-name .fase-tag{
-    display: inline-block;
-    font-family: var(--mono);
-    font-size: 9.5px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    background: var(--bg-raised);
-    border: 1px solid var(--border-soft);
-    padding: 2px 7px;
-    border-radius: 2px;
-    margin-bottom: 8px;
-  }
-  .fase-name small{
-    display:block;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text-dim);
-    margin-top: 6px;
-    letter-spacing: 0.02em;
-  }
-  .fase-track{
-    position: relative;
-    height: 26px;
-    background: var(--bg-raised);
-    border-radius: 2px;
-    overflow: hidden;
-    border: 1px solid var(--border-soft);
-  }
-  .fase-figures{
-    font-family: var(--mono);
-    font-size: 13px;
-    text-align: right;
-    color: var(--text-muted);
-    line-height: 1.75;
-  }
-  .fase-figures .p{ color: var(--paid); }
-  .fase-figures .q{ color: var(--pending); }
-  .fase-figures .pct{
-    font-size: 20px;
-    color: var(--text);
-    font-weight: 500;
-  }
+/* ===== LEDGER ===== */
+.status-filter{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+.status-filter .pill{padding:6px 14px; font-size:11.5px;}
+.ledger{overflow:hidden;}
+.lg-group + .lg-group{border-top:1px solid var(--line);}
+.lg-head{display:grid; grid-template-columns:28px minmax(180px,1.3fr) 2fr auto; gap:16px; align-items:center; padding:14px 18px; background:var(--bg-panel); cursor:pointer;}
+.lg-head .nm{font-family:var(--serif); font-size:16px;}
+.lg-head .nm small{display:block; font-family:var(--mono); font-size:10.5px; color:var(--text-dim); margin-top:3px;}
+.lg-head .fig{font-family:var(--mono); font-size:11.5px; text-align:right; line-height:1.6; color:var(--text-mut);}
+.lg-head .fig .r{color:var(--river);} .lg-head .fig .p{color:var(--gold);}
+@media (max-width:700px){ .lg-head{grid-template-columns:28px 1fr; } .lg-head .track, .lg-head .fig{grid-column:2;} .lg-head .fig{text-align:left;} }
+.lg-items{display:none;}
+.lg-items.open{display:block;}
+.lg-cols{display:grid; grid-template-columns:110px 120px 1fr 180px 28px; gap:12px; padding:8px 18px; font-family:var(--mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); border-top:1px solid var(--line-soft); background:var(--bg-card);}
+.lg-row{border-top:1px solid var(--line-soft); background:var(--bg-card);}
+.lg-sum{display:grid; grid-template-columns:110px 120px 1fr 180px 28px; gap:12px; padding:12px 18px; align-items:center; cursor:pointer;}
+.lg-sum:hover{background:#F0F6FD;}
+.lg-sum .d{font-family:var(--mono); font-size:12px;}
+.lg-sum .v{font-family:var(--mono); font-size:13px; font-weight:600;}
+.lg-sum .t{font-size:13.5px; line-height:1.35;}
+.lg-sum .s{text-align:right;}
+.lg-row .bar{width:3px; align-self:stretch;}
+@media (max-width:700px){
+  .lg-cols{display:none;}
+  .lg-sum{grid-template-columns:1fr auto 28px; gap:6px 10px;}
+  .lg-sum .d{grid-column:1; grid-row:1;} .lg-sum .v{grid-column:2; grid-row:1; text-align:right;}
+  .lg-sum .t{grid-column:1 / 3; grid-row:2;} .lg-sum .s{grid-column:1 / 3; grid-row:3; text-align:left;}
+  .lg-sum .tg{grid-column:3; grid-row:1;}
+}
+.lg-det{display:none; padding:0 18px 16px 18px; font-size:12.5px; color:var(--text-mut); line-height:1.55;}
+.lg-det.open{display:block;}
+.lg-det .meta{font-family:var(--mono); font-size:10.5px; color:var(--text-dim); margin-bottom:6px;}
+.lg-det .rb{margin-top:6px; padding:8px 10px; border-left:3px solid var(--river); background:var(--bg-deep); border-radius:0 6px 6px 0;}
+.lg-det .rb.warn{border-left-color:var(--gold); background:#FBF7EC;}
+.st{font-family:var(--mono); font-size:10.5px; padding:3px 8px; border-radius:4px; white-space:nowrap; display:inline-block;}
+.st.paid{background:rgba(12,140,130,.12); color:var(--river); border:1px solid rgba(12,140,130,.35);}
+.st.late{background:rgba(192,57,43,.10); color:var(--late); border:1px solid rgba(192,57,43,.4);}
+.st.soon{background:rgba(178,106,0,.10); color:var(--warn); border:1px solid rgba(178,106,0,.4);}
+.st.ok{background:rgba(46,125,79,.10); color:var(--ok); border:1px solid rgba(46,125,79,.35);}
+.st.blk{background:var(--bg-panel); color:var(--text-mut); border:1px solid var(--line);}
 
-  /* ===== VISÃO POR EIXO ===== */
-  .eixo-row{
-    display: grid;
-    grid-template-columns: 240px 1fr 260px;
-    gap: 20px;
-    align-items: center;
-    padding: 18px 0;
-    border-bottom: 1px solid var(--border-soft);
-  }
-  .eixo-row:first-of-type{ border-top: 1px solid var(--border-soft); }
-  @media (max-width: 760px){
-    .eixo-row{ grid-template-columns: 1fr; gap: 10px; }
-  }
-  .eixo-name{
-    font-family: var(--serif);
-    font-size: 15.5px;
-    color: var(--text);
-  }
-  .eixo-name small{
-    display:block;
-    font-family: var(--mono);
-    font-size: 10.5px;
-    color: var(--text-dim);
-    margin-top: 4px;
-    letter-spacing: 0.03em;
-  }
-  .bar-track{
-    position: relative;
-    height: 22px;
-    background: var(--bg-raised);
-    border-radius: 2px;
-    overflow: hidden;
-    border: 1px solid var(--border-soft);
-  }
-  .bar-fill{ position:absolute; top:0; left:0; height:100%; background: var(--paid); }
-  .bar-fill.pending-fill{ background: var(--pending); left: auto; right: 0; }
-  .eixo-figures{
-    font-family: var(--mono);
-    font-size: 12px;
-    text-align: right;
-    color: var(--text-muted);
-    line-height: 1.7;
-  }
-  .eixo-figures .p{ color: var(--paid); }
-  .eixo-figures .q{ color: var(--pending); }
+/* ===== DESPESAS ===== */
+.mini-kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:14px;}
+@media (max-width:760px){ .mini-kpis{grid-template-columns:1fr 1fr;} }
+.mini{padding:14px 16px;}
+.mini .k-label{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim);}
+.mini .k-val{font-family:var(--mono); font-size:20px; font-weight:600; margin-top:6px;}
+.mini .k-sub{font-family:var(--mono); font-size:11px; color:var(--text-mut); margin-top:3px;}
+.exec-bar{display:flex; height:14px; border-radius:7px; overflow:hidden; gap:2px; margin:4px 0 8px;}
+.exec-bar span{display:block; height:100%;}
+.legend{display:flex; gap:16px; flex-wrap:wrap; font-family:var(--mono); font-size:11px; color:var(--text-mut); margin-bottom:14px;}
+.legend i{display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px; vertical-align:-1px;}
+.pbar{display:inline-block; width:70px; height:6px; border-radius:3px; background:var(--bg-panel-2); vertical-align:middle; margin-left:8px; overflow:hidden; position:relative;}
+.pbar span{position:absolute; left:0; top:0; height:100%; background:var(--river); border-radius:3px;}
 
-  /* ===== PENDÊNCIAS ===== */
-  .ledger{
-    border: 1px solid var(--border);
-  }
-  .ledger-head{
-    display:grid;
-    grid-template-columns: 108px 130px 1fr 34px;
-    gap: 14px;
-    padding: 10px 18px;
-    background: var(--bg-raised);
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    border-bottom: 1px solid var(--border);
-  }
-  @media (max-width: 620px){
-    .ledger-head{ grid-template-columns: 84px 96px 1fr 30px; gap: 8px; padding: 10px 12px; }
-  }
-  .ledger-item{
-    border-bottom: 1px solid var(--border-soft);
-    background: var(--bg-panel);
-  }
-  .ledger-item:last-child{ border-bottom: none; }
+/* ===== FLUXO ===== */
+.chart-grid{display:grid; grid-template-columns:1.4fr 1fr; gap:12px; margin-bottom:14px;}
+@media (max-width:900px){ .chart-grid{grid-template-columns:1fr;} }
+.chart-card{padding:16px 18px 10px; position:relative;}
+.chart-card h3{font-family:var(--serif); font-weight:500; font-size:15.5px; margin:0 0 2px;}
+.chart-card .ch-sub{font-size:11.5px; color:var(--text-mut); margin-bottom:8px;}
+.chart-card svg{width:100%; height:auto; display:block; overflow:visible;}
+.tip{position:fixed; pointer-events:none; z-index:50; background:var(--text); color:#fff; font-family:var(--mono); font-size:11.5px; padding:8px 10px; border-radius:6px; line-height:1.55; opacity:0; transition:opacity .1s; max-width:260px; box-shadow:0 4px 14px rgba(22,35,63,.25);}
+.tip b{color:#9FE3DA; font-weight:600;}
+.reserve{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:14px;}
+@media (max-width:760px){ .reserve{grid-template-columns:1fr;} }
 
-  .ledger-eixo-group{ border-bottom: 1px solid var(--border-soft); }
-  .ledger-eixo-group:last-child{ border-bottom: none; }
+/* ===== ANÁLISES ===== */
+.analysis-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+@media (max-width:820px){ .analysis-grid{grid-template-columns:1fr;} }
+.a-card{padding:18px 20px;}
+.a-label{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; margin-bottom:8px; font-weight:600;}
+.a-label.risk{color:var(--late);} .a-label.watch{color:var(--warn);} .a-label.info{color:var(--sand);} .a-label.ok{color:var(--river);}
+.a-card h3{font-family:var(--serif); font-weight:500; font-size:16.5px; margin:0 0 8px; line-height:1.3;}
+.a-card p{font-size:13px; line-height:1.62; color:var(--text-mut); margin:0;}
+.a-card p + p{margin-top:8px;}
+.a-card .fg{font-family:var(--mono); color:var(--text); font-weight:600;}
+.rank{list-style:none; padding:0; margin:8px 0 0;}
+.rank li{display:grid; grid-template-columns:1fr 92px; gap:10px; align-items:center; font-size:12px; padding:5px 0; border-bottom:1px dashed var(--line-soft);}
+.rank li .nm{color:var(--text);}
+.rank li .vl{font-family:var(--mono); text-align:right; color:var(--text);}
+.rank li .bb{grid-column:1 / 3; height:4px; border-radius:2px; background:var(--bg-panel-2); overflow:hidden;}
+.rank li .bb span{display:block; height:100%; background:var(--s-desp); border-radius:2px;}
 
-  .ledger-eixo-header{
-    display:flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 18px;
-    padding: 16px 18px;
-    background: var(--bg-raised-2);
-    cursor: pointer;
-  }
-  .ledger-eixo-header .eixo-name{ flex: 1 1 220px; min-width: 180px; }
-  .ledger-eixo-header .bar-track{ flex: 2 1 200px; min-width: 140px; }
-  .ledger-eixo-header .eixo-figures{ flex: 0 0 auto; text-align: right; }
-  .ledger-eixo-header .ledger-toggle{ flex: 0 0 auto; }
-  @media (max-width: 620px){
-    .ledger-eixo-header{ padding: 13px 12px; gap: 10px; }
-    .ledger-eixo-header .eixo-figures{ text-align: left; }
-  }
-
-  .ledger-eixo-items{ display: none; }
-  .ledger-eixo-items.open{ display: block; }
-
-  .ledger-summary{
-    display:grid;
-    grid-template-columns: 108px 130px 1fr 34px;
-    gap: 14px;
-    padding: 15px 18px;
-    align-items: center;
-    cursor: pointer;
-  }
-  @media (max-width: 620px){
-    .ledger-summary{ grid-template-columns: 84px 96px 1fr 30px; gap: 8px; padding: 13px 12px; }
-  }
-
-  .ledger-tag{
-    font-family: var(--mono);
-    font-size: 10.5px;
-    padding: 3px 8px;
-    border-radius: 2px;
-    display: inline-block;
-    width: fit-content;
-    white-space: nowrap;
-    height: fit-content;
-  }
-  .tag-overdue{ background: var(--danger-soft); color: var(--danger); border: 1px solid rgba(217,99,90,0.5); }
-  .tag-soon{ background: var(--pending-soft); color: var(--pending); border: 1px solid rgba(240,160,75,0.5); }
-  .tag-normal{ background: rgba(255,255,255,0.08); color: var(--text-muted); border: 1px solid var(--border-soft); }
-  .tag-unclear{ background: rgba(207,214,168,0.16); color: var(--info); border: 1px solid rgba(207,214,168,0.4); }
-  .tag-negociacao{ background: var(--pending-soft); color: var(--pending); border: 1px solid rgba(240,160,75,0.55); }
-  .tag-paid{ background: var(--paid-soft); color: var(--paid); border: 1px solid rgba(224,185,58,0.5); }
-
-  .ledger-toggle{
-    width: 26px;
-    height: 26px;
-    border-radius: 6px;
-    background: rgba(217,122,45,0.16);
-    border: 1px solid rgba(217,122,45,0.45);
-    color: #d97a2d;
-    font-family: var(--mono);
-    font-size: 15px;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background .15s ease, color .15s ease;
-    padding: 0;
-  }
-  .ledger-toggle:hover{ background: rgba(217,122,45,0.28); }
-  .ledger-toggle.open{ background: #d97a2d; color: #2a1c0f; border-color: #d97a2d; }
-
-  .prazo-hist{
-    margin-top: 8px;
-    padding-left: 10px;
-    border-left: 2px solid var(--border-soft);
-  }
-  .prazo-hist-row{
-    font-size: 10.5px;
-    color: var(--text-dim);
-    line-height: 1.6;
-  }
-  .prazo-hist-row.current{ color: var(--pending); }
-  .prazo-hist-row .d{ font-family: var(--mono); }
-
-  .ledger-details{
-    display: none;
-    padding: 0 18px 18px 18px;
-  }
-  .ledger-details.open{ display: block; }
-  @media (max-width: 620px){ .ledger-details{ padding: 0 12px 16px 12px; } }
-
-  .ledger-desc-full{ font-size: 13.5px; line-height: 1.55; color: var(--text); }
-  .ledger-desc-full .eixo-tiny{
-    display:block;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--text-dim);
-    margin-top: 7px;
-    letter-spacing: 0.03em;
-  }
-  .ledger-desc-full .note{
-    display:block;
-    font-size: 11.5px;
-    color: var(--text-dim);
-    margin-top: 7px;
-    font-style: italic;
-    line-height: 1.45;
-  }
-  .ledger-desc-full .ledger-tag-wrap{ display:block; margin-bottom: 8px; }
-  .ledger-prazo{
-    font-family: var(--mono);
-    font-size: 12.5px;
-    color: inherit;
-  }
-  @media (max-width: 620px){ .ledger-prazo{ font-size: 11px; } }
-  .ledger-desc-inline{
-    font-size: 13.5px;
-    line-height: 1.4;
-    color: inherit;
-  }
-  @media (max-width: 620px){ .ledger-desc-inline{ font-size: 12px; } }
-  .ledger-valor{
-    font-family: var(--mono);
-    font-size: 14px;
-    color: inherit;
-    font-weight: 600;
-  }
-  @media (max-width: 620px){ .ledger-valor{ font-size: 12px; } }
-
-  /* ===== ANÁLISES ===== */
-  .analysis-grid{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-  }
-  @media (max-width: 760px){
-    .analysis-grid{ grid-template-columns: 1fr; }
-  }
-  .analysis-card{
-    background: var(--bg-panel);
-    padding: 22px 24px;
-  }
-  .analysis-card .a-label{
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-  .a-label.risk{ color: var(--danger); }
-  .a-label.watch{ color: var(--pending); }
-  .a-label.info{ color: var(--info); }
-  .a-label.ok{ color: var(--paid); }
-  .analysis-card h3{
-    font-family: var(--serif);
-    font-weight: 400;
-    font-size: 16px;
-    margin: 0 0 10px;
-    color: var(--text);
-  }
-  .analysis-card p{
-    font-size: 13px;
-    line-height: 1.65;
-    color: var(--text-muted);
-    margin: 0;
-  }
-  .analysis-card p + p{ margin-top: 10px; }
-  .analysis-card .figure{
-    font-family: var(--mono);
-    color: var(--text);
-  }
-
-  footer{
-    border-top: 1px solid var(--border-soft);
-    padding-top: 22px;
-    font-family: var(--mono);
-    font-size: 10.5px;
-    color: var(--text-dim);
-    line-height: 1.8;
-  }
-  footer b{ color: var(--text-muted); }
-
-  /* ===== SEGMENTED PILL FILTER ===== */
-  .pill-group{
-    display:flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 26px;
-  }
-  .pill{
-    font-family: var(--mono);
-    font-size: 13px;
-    padding: 10px 22px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: background .15s ease, border-color .15s ease, color .15s ease;
-    line-height: 1.2;
-  }
-  .pill:hover{ border-color: var(--text-dim); color: var(--text); }
-  .pill.active{
-    background: var(--paid);
-    border-color: var(--paid);
-    color: #2a1c0f;
-    font-weight: 700;
-  }
-  .pill-group.small .pill{ padding: 7px 16px; font-size: 11.5px; }
-  .pill-group.small{ margin-bottom: 18px; }
-  .fase-row.dimmed{ opacity: 0.4; }
-  .fase-row.selected{ border-color: var(--paid); }
+footer{border-top:1px solid var(--line); padding-top:20px; font-size:11.5px; color:var(--text-mut); line-height:1.75;}
+footer b{color:var(--text);}
+footer p{margin:0 0 8px;}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <div class="masthead">
-    <div>
-      <div class="masthead-eyebrow">SEDUC · OEI · IDG — Controle de Entregas e Recebimentos</div>
-      <h1>MUSEDUCA — Painel Financeiro</h1>
-    </div>
-    <div class="masthead-meta">
-      GERADO EM <b id="genDate"></b><br>
-      FONTE · Planilha de Controle de Entrega e Recebimentos<br>
-      2 FASES · 3 EIXOS · <span id="totalItensMeta"></span> ENTREGÁVEIS
-    </div>
+<header class="masthead">
+  <div>
+    <div class="brand-eyebrow"><span class="dot"></span>SEDUC · OEI · IDG — Porto Alegre, RS</div>
+    <h1 class="title">MUSEDUCA <em>Painel Financeiro</em><span class="yrs">2025 – 2027</span></h1>
+    <div class="subtitle">Recebimentos dos dois contratos (original e 4º Aditivo), status dos entregáveis, execução orçamentária de 2026 (MXM) e fluxo de caixa projetado.</div>
   </div>
+  <div class="meta-box">
+    <div class="label">Posição em</div>
+    <div class="num" id="posDate">—</div>
+    <div class="sub">Próximo recebimento previsto:<br><b id="nextRec">—</b></div>
+  </div>
+</header>
 
-  <!-- ===================== RESUMO EXECUTIVO ===================== -->
-  <section>
-    <div class="section-head">
-      <span class="section-num">01</span>
-      <h2>Resumo executivo</h2>
-      <div class="rule"></div>
-    </div>
-
-    <div class="pill-group" id="faseFilter">
-      <button class="pill active" data-fase="all">Visão consolidada</button>
-      <button class="pill" data-fase="Fase 1">Fase 1</button>
-      <button class="pill" data-fase="Fase 2">Fase 2</button>
-    </div>
-
-    <div class="resumo-grid">
-      <div class="stat-card">
-        <div class="stat-label">Valor total do projeto</div>
-        <div>
-          <div class="stat-value" id="statTotal">—</div>
-          <div class="stat-sub" id="statTotalSub">—</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Total recebido</div>
-        <div>
-          <div class="stat-value paid" id="statPago">—</div>
-          <div class="stat-sub" id="statPagoSub">—</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Total pendente</div>
-        <div>
-          <div class="stat-value pending" id="statPendente">—</div>
-          <div class="stat-sub" id="statPendenteSub">—</div>
-        </div>
-      </div>
-      <div class="seal-card">
-        <svg width="128" height="128" viewBox="0 0 128 128" id="sealSvg"></svg>
-        <div class="seal-caption">Execução<br>financeira</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== VISÃO POR FASE ===================== -->
-  <section>
-    <div class="section-head">
-      <span class="section-num">02</span>
-      <h2>Visão por fase</h2>
-      <div class="rule"></div>
-    </div>
-    <div id="faseRows"></div>
-  </section>
-
-  <!-- ===================== PENDÊNCIAS ===================== -->
-  <section>
-    <div class="section-head">
-      <span class="section-num">03</span>
-      <h2 id="ledgerTitle">Entregáveis pendentes — ordenados por prazo</h2>
-      <div class="rule"></div>
-    </div>
-    <div class="pill-group small" id="statusFilter">
-      <button class="pill active" data-status="todos">Todos os entregáveis</button>
-      <button class="pill" data-status="pendentes">Pendentes</button>
-    </div>
-    <div class="ledger">
-      <div class="ledger-head">
-        <div>Data</div>
-        <div>Valor</div>
-        <div>Entregável</div>
-        <div></div>
-      </div>
-      <div id="pendRows"></div>
-    </div>
-  </section>
-
-  <!-- ===================== ANÁLISES ===================== -->
-  <section>
-    <div class="section-head">
-      <span class="section-num">04</span>
-      <h2>Análises</h2>
-      <div class="rule"></div>
-    </div>
-    <div class="analysis-grid" id="analysisGrid"></div>
-  </section>
-
-  <footer>
-    <b>Atualização de prazos — 15ª e 18ª parcelas</b> — Conforme e-mail de 06/07/2026 (Amarílis Lage, IDG), há proposta de adiamento para <b>30/10/2026</b> (15ª) e <b>30/11/2026</b> (18ª), motivada pela ampliação de escopo desses produtos (inclusão de equipamentos e tecnologia, além de mobiliário, conforme ata de 03/02/2026). A SEDUC (Cristiano Goldschmidt) ainda não confirmou essas datas nesta thread — por isso aparecem como <b>"proposta · aguardando SEDUC"</b>, com o histórico completo de datas visível em cada item.<br>
-    <b>Ressalva de dados</b> — As datas de prazo das 16ª e 17ª parcelas do 4º Aditivo constam na planilha de origem como texto com asterisco, associadas a notas de rodapé que indicam renegociação de datas entre SEDUC e IDG ainda sem confirmação oficial por e-mail. Neste painel elas aparecem sinalizadas como <b>"a confirmar"</b> e não entram na ordenação cronológica dos demais itens.<br>
-    <b>Outras inconsistências identificadas na planilha de origem</b> — data de emissão de NF do item "Análise de Contexto Político-Econômico" (Eixo Gestão) grafada como 22/04/0205, provável erro de digitação; data de NF do item "Pesquisa de Mercado" registrada como texto "Confirmando dado" em vez de data.
-  </footer>
-
+<div class="filter-bar" id="faseFilter">
+  <button class="pill active" data-fase="all">Visão consolidada</button>
+  <button class="pill" data-fase="c1">Fase 1 <small>contrato original</small></button>
+  <button class="pill" data-fase="c2">Fase 2 <small>4º Aditivo</small></button>
 </div>
 
+<!-- 01 RESUMO -->
+<section>
+  <div class="section-head"><span class="section-num">01</span><h2>Resumo dos contratos</h2><div class="rule"></div></div>
+  <p class="section-desc">Valores contratuais e recebimentos conforme cronograma da planilha MXM (aba Fluxo). O filtro acima vale para as seções 01 a 03.</p>
+  <div class="kpi-grid">
+    <div class="card kpi"><div class="k-label">Valor contratado</div><div><div class="k-val" id="kTotal">—</div><div class="k-sub" id="kTotalSub">—</div></div></div>
+    <div class="card kpi"><div class="k-label">Recebido</div><div><div class="k-val rec" id="kRec">—</div><div class="k-sub" id="kRecSub">—</div></div></div>
+    <div class="card kpi"><div class="k-label">A receber</div><div><div class="k-val pend" id="kPend">—</div><div class="k-sub" id="kPendSub">—</div></div></div>
+    <div class="card gauge-card"><svg id="gauge" width="190" height="112" viewBox="0 0 190 112"></svg><div class="gauge-cap">Execução financeira<br>(% recebido)</div></div>
+  </div>
+  <div class="fase-strip" id="faseStrip"></div>
+</section>
+
+<!-- 02 RECEITAS -->
+<section>
+  <div class="section-head"><span class="section-num">02</span><h2>Cronograma de recebimentos</h2><div class="rule"></div></div>
+  <p class="section-desc">Por contrato e ano. Clique em + para ver cada parcela. <span class="chip rec">recebido</span> já entrou na conta · <span class="chip prev">previsto</span> cronograma · <span class="chip risk">em risco</span> depende de entregável vencido e ainda não entregue.</p>
+  <div class="card table-wrap"><table class="fin" id="recTable"></table></div>
+</section>
+
+<!-- 03 ENTREGÁVEIS -->
+<section>
+  <div class="section-head"><span class="section-num">03</span><h2 id="ledgerTitle">Entregáveis</h2><div class="rule"></div></div>
+  <p class="section-desc">Agrupados por eixo. Status calculado na data de posição. Clique no eixo para abrir a lista e no item para ver detalhes de entrega e recebimento.</p>
+  <div class="status-filter" id="statusFilter">
+    <button class="pill active" data-status="todos">Todos</button>
+    <button class="pill" data-status="pendentes">Só pendentes</button>
+  </div>
+  <div class="card ledger" id="ledger"></div>
+</section>
+
+<!-- 04 DESPESAS -->
+<section>
+  <div class="section-head"><span class="section-num">04</span><h2>Execução orçamentária 2026</h2><div class="rule"></div></div>
+  <p class="section-desc">Orçamento 2026 carregado no MXM (aba mxm). Árvore: Centro de custo → Conta orçamentária → Fornecedor. Linhas “a contratar” são saldo orçado sem fornecedor definido.</p>
+  <div class="mini-kpis" id="despKpis"></div>
+  <div class="card" style="padding:14px 18px 6px; margin-bottom:12px;">
+    <div class="exec-bar" id="execBar"></div>
+    <div class="legend">
+      <span><i style="background:var(--s-desp)"></i>Realizado</span>
+      <span><i style="background:#8FAAD9"></i>Comprometido</span>
+      <span><i style="background:var(--bg-panel-2); border:1px solid var(--line)"></i>Saldo</span>
+    </div>
+  </div>
+  <div class="card table-wrap"><table class="fin" id="despTable"></table></div>
+</section>
+
+<!-- 05 FLUXO -->
+<section>
+  <div class="section-head"><span class="section-num">05</span><h2>Fluxo de caixa 2026</h2><div class="rule"></div></div>
+  <p class="section-desc">Jan–set realizados (MXM); out–dez projetados. Saldo acumulado conforme a planilha (base MDA). Passe o cursor sobre as barras e pontos para ver os valores.</p>
+  <div class="chart-grid">
+    <div class="card chart-card">
+      <h3>Entradas × saídas por mês</h3>
+      <div class="ch-sub">Barras tracejadas = projeção</div>
+      <div class="legend" style="margin-bottom:4px"><span><i style="background:var(--s-rec)"></i>Entradas</span><span><i style="background:var(--s-desp)"></i>Saídas</span></div>
+      <svg id="chartFlow" viewBox="0 0 640 260"></svg>
+    </div>
+    <div class="card chart-card">
+      <h3>Saldo acumulado</h3>
+      <div class="ch-sub">Linha tracejada = saldo sem os R$ 30 mil do vídeo (parcela em risco)</div>
+      <div class="legend" style="margin-bottom:4px"><span><i style="background:var(--s-rec)"></i>Saldo projetado</span><span><i style="background:var(--rust)"></i>Cenário sem a 16ª (vídeo)</span></div>
+      <svg id="chartSaldo" viewBox="0 0 440 260"></svg>
+    </div>
+  </div>
+  <div class="card table-wrap"><table class="fin" id="fluxoTable"></table></div>
+  <div class="reserve" id="reserveCards"></div>
+</section>
+
+<!-- 06 ANÁLISES -->
+<section>
+  <div class="section-head"><span class="section-num">06</span><h2>Análises</h2><div class="rule"></div></div>
+  <div class="analysis-grid" id="analysisGrid"></div>
+</section>
+
+<footer>
+  <p><b>Fontes</b> — MUSEDUCA - MXM.xlsx (abas <i>mxm</i> e <i>Fluxo</i>) para orçamento, realizado, fluxo e cronogramas de recebimento; Planilha de Controle de Entrega e Recebimentos e 4º Termo Aditivo (set/2026) para os entregáveis.</p>
+  <p><b>Base do contrato 1</b> — Valor total, recebido e a receber seguem o Excel (R$ 2.500.000 · R$ 2.120.000 · R$ 380.000). Os valores nominais dos 14 entregáveis somam R$ 2.550.000. A diferença de R$ 50 mil está no lote recebido em abr/2026 (R$ 1.250.000 recebidos para seis produtos que somam R$ 1.300.000 nominais) e precisa ser conciliada. A associação entre parcelas recebidas e produtos foi feita por valor e data.</p>
+  <p><b>4º Aditivo (contrato 2, R$ 625 mil)</b> — Os recebimentos de out–dez/2026 na aba Fluxo são o planejamento do aditivo, confirmado pela gerência: outubro, vídeo institucional + plano de gestão (16ª + 17ª, R$ 115.000); novembro, projeto básico do mobiliário da recepção e ADM (15ª, R$ 30.000); dezembro, projeto executivo do mobiliário da recepção e ADM (18ª, R$ 45.000). Posição em 15/10/2026: plano de gestão entregue, a faturar; vídeo não entregue (gravação em 08/10, prévia em 22/10, versão final ~06/11); projeto básico do mobiliário entregue hoje; projeto executivo previsto para o fim de outubro. A planilha registra que o contrato 2 ainda não tem previsão de despesas.</p>
+  <p><b>Inconsistências na planilha de origem</b> — Na aba <i>mxm</i>, a linha “Coordenação IDG” tem a coluna “Compr. + Real.” zerada, embora mostre R$ 190.000 realizados e R$ 55.000 comprometidos. Por isso, o total da coluna J (R$ 692.328) fica R$ 245 mil abaixo de realizado + comprometido (R$ 937.328). Este painel recalcula o valor. A soma das despesas de jan–set na aba Fluxo (R$ 751.244) difere em R$ 17 mil do realizado MXM (R$ 768.274). As entradas que não são parcelas contratuais (R$ 183.375 em 2026, das quais R$ 114.615 em janeiro) aparecem como “rendimentos e outras entradas”.</p>
+</footer>
+
+</div>
+<div class="tip" id="tip"></div>
+
 <script>
-const DATA = {"eixos": {"Eixo Museológico": [{"item": 1, "desc": "Plano de Trabalho", "prazo": "2025-01-15", "valor": 150000, "status_entrega": "Entregue no prazo", "pago": true}, {"item": 2, "desc": "Concepção Estratégica", "prazo": "2025-03-16", "valor": 100000, "status_entrega": "Entregue no prazo", "pago": true}, {"item": 3, "desc": "Mapeamento de Repertório", "prazo": "2025-05-15", "valor": 250000, "status_entrega": "Entregue em 25/02/2026", "pago": true}, {"item": 4, "desc": "Plano Museológico", "prazo": "2025-09-02", "valor": 300000, "status_entrega": "Entregue em 19/02/2026", "pago": true}, {"item": 5, "desc": "Projeto Educativo", "prazo": "2025-09-12", "valor": 150000, "status_entrega": "Entregue em 19/02/2026", "pago": true}, {"item": 6, "desc": "Projeto de Acessibilidade", "prazo": "2025-09-12", "valor": 250000, "status_entrega": "Entregue em 19/02/2026", "pago": true}, {"item": 7, "desc": "Entregas Físicas de Acessibilidade", "prazo": "2025-09-12", "valor": 360000, "status_entrega": "Não entregue — condicionado à execução física das obras e instalação dos elementos estruturais de suporte", "pago": false}, {"item": 8, "desc": "Relatório Final", "prazo": "2025-09-12", "valor": 20000, "status_entrega": "Não entregue — dependente da consolidação de todas as etapas físicas e documentais precedentes", "pago": false}], "Eixo Gestão e Governança": [{"item": 1, "desc": "Análise de Contexto Político-Econômico", "prazo": "2025-02-14", "valor": 200000, "status_entrega": "Entregue no prazo", "pago": true}, {"item": 2, "desc": "Pesquisa de Mercado", "prazo": "2025-04-15", "valor": 150000, "status_entrega": "Entregue no prazo", "pago": true}, {"item": 3, "desc": "Plano de Gestão e Governança do Museu", "prazo": "2025-06-14", "valor": 250000, "status_entrega": "Entregue em 08/04/2026", "pago": true}, {"item": 4, "desc": "Programa de Capacitação de Equipe", "prazo": "2025-09-02", "valor": 150000, "status_entrega": "Entregue em 25/02/2026", "pago": true}, {"item": 5, "desc": "Estratégia e Plano Detalhado de Marca e Comunicação", "prazo": "2025-09-12", "valor": 200000, "status_entrega": "Entregue em 19/02/2026", "pago": true}, {"item": 6, "desc": "Relatório Final", "prazo": "2025-09-12", "valor": 20000, "status_entrega": "Entregue em 08/04/2026", "pago": true}], "4º Aditivo de Contrato": [{"item": "15ª Parcela", "desc": "Projeto básico do mobiliário para áreas do Receptivo e do Administrativo", "prazo": "2026-10-14", "valor": 30000, "status_entrega": "Prazo confirmado no 4º Termo Aditivo (assinatura set/2026) — oficialmente Produto 17 do Anexo II.", "pago": false}, {"item": "16ª Parcela", "desc": "Vídeo Institucional de Divulgação do Projeto", "prazo": "2026-09-30", "valor": 30000, "status_entrega": "Prazo confirmado no 4º Termo Aditivo (assinatura set/2026) — oficialmente Produto 16 do Anexo II.", "pago": false}, {"item": "17ª Parcela", "desc": "Assessoria técnica do Plano de Gestão — Desenho de Governança e Modelo de Gestão", "prazo": "2026-09-15", "valor": 85000, "status_entrega": "Prazo confirmado no 4º Termo Aditivo (assinatura set/2026) — oficialmente Produto 15 do Anexo II.", "pago": false}, {"item": "18ª Parcela", "desc": "Projeto executivo do mobiliário para áreas do Receptivo e do Administrativo", "prazo": "2026-10-30", "valor": 45000, "status_entrega": "Prazo confirmado no 4º Termo Aditivo (assinatura set/2026) — oficialmente Produto 18 do Anexo II.", "pago": false}, {"item": "19ª Parcela", "desc": "Projeto educativo da exposição temporária", "prazo": "2026-11-11", "valor": 180000, "status_entrega": "Prazo confirmado no 4º Termo Aditivo (assinatura set/2026) — oficialmente Produto 19 do Anexo II.", "pago": false}, {"item": "20ª Parcela", "desc": "Assessoria técnica do Plano de Gestão — Modelagem de Gestão de Governança e Operação do Museu", "prazo": "2026-11-30", "valor": 85000, "status_entrega": "Prazo confirmado no 4º Termo Aditivo (assinatura set/2026) — oficialmente Produto 20 do Anexo II.", "pago": false}, {"item": "21ª Parcela", "desc": "Assessoria técnica do Plano de Gestão — Apoio técnico na implementação do Plano de Comunicação", "prazo": "2027-04-30", "valor": 85000, "status_entrega": "Prazo confirmado no 4º Termo Aditivo (assinatura set/2026) — oficialmente Produto 21 do Anexo II.", "pago": false}, {"item": "22ª Parcela", "desc": "Assessoria técnica do Plano de Gestão — Consolidação final da assessoria de implementação do Plano Museológico e do Plano de Gestão", "prazo": "2027-07-31", "valor": 85000, "status_entrega": "Prazo confirmado no 4º Termo Aditivo (assinatura set/2026) — oficialmente Produto 22 do Anexo II.", "pago": false}]}};
+// =====================================================================
+// DADOS
+// =====================================================================
+const TODAY = new Date('2026-10-15T00:00:00');
 
-const fmtBRL = (v) => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits: 0, maximumFractionDigits: 0});
-const fmtBRLcents = (v) => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-
-const TODAY = new Date('2026-09-13T00:00:00');
-
-function parseDate(s){
-  if(!s) return null;
-  return new Date(s + 'T00:00:00');
-}
-function fmtDateBR(d){
-  if(!d) return '—';
-  return d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric'});
-}
-function daysDiff(d){
-  return Math.round((d - TODAY) / (1000*60*60*24));
-}
-
-// ---------- flatten ----------
-const FASE_MAP = {
-  'Eixo Museológico': 'Fase 1',
-  'Eixo Gestão e Governança': 'Fase 1',
-  '4º Aditivo de Contrato': 'Fase 2',
-};
-const FASE_LABEL = {
-  'Fase 1': 'Concepção, planos e produtos base',
-  'Fase 2': '4º Aditivo — ocupação, mobiliário e consolidação',
+const CONTRATOS = {
+  c1: { fase:'Fase 1', nome:'Contrato original', desc:'Concepção, planos e produtos base', valor:2500000 },
+  c2: { fase:'Fase 2', nome:'4º Aditivo — contrato novo', desc:'Ocupação, mobiliário e assessoria de gestão', valor:625000 },
 };
 
-let allItems = [];
-Object.entries(DATA.eixos).forEach(([eixo, items]) => {
-  items.forEach(it => allItems.push({...it, eixo, fase: FASE_MAP[eixo]}));
-});
+// Parcelas de recebimento (aba Fluxo). status: rec | prev | risk
+const RECEB = [
+  {c:'c1', ano:2025, mes:2,  valor:150000,  status:'rec',  ref:'Plano de Trabalho (Museológico, item 1)'},
+  {c:'c1', ano:2025, mes:4,  valor:200000,  status:'rec',  ref:'Análise de Contexto Político-Econômico (Gestão, item 1)'},
+  {c:'c1', ano:2025, mes:5,  valor:100000,  status:'rec',  ref:'Concepção Estratégica (Museológico, item 2)'},
+  {c:'c1', ano:2025, mes:6,  valor:150000,  status:'rec',  ref:'Pesquisa de Mercado (Gestão, item 2)'},
+  {c:'c1', ano:2026, mes:4,  valor:1250000, status:'rec',  ref:'Lote de 6 produtos entregues em fev/2026 — nominal R$ 1.300.000', nota:'R$ 50 mil abaixo do valor nominal do lote (a conciliar)'},
+  {c:'c1', ano:2026, mes:6,  valor:270000,  status:'rec',  ref:'Plano de Gestão e Governança + Relatório Final (Gestão)'},
+  {c:'c1', ano:2027, mes:null, valor:380000, status:'prev', ref:'Entregas Físicas de Acessibilidade + Relatório Final (Museológico)', nota:'Cronograma original: dez/2026 — agora previsto para 2027'},
+  {c:'c2', ano:2026, mes:10, valor:85000,   status:'prev', ref:'17ª parcela — Plano de Gestão (Desenho de Governança e Modelo de Gestão)', nota:'Produto entregue — falta faturar'},
+  {c:'c2', ano:2026, mes:10, valor:30000,   status:'risk', ref:'16ª parcela — Vídeo institucional', nota:'Não entregue. Gravação com o governador e a secretária em 08/10; prévia em 22/10; versão final ~06/11. Recebimento tende a sair de outubro'},
+  {c:'c2', ano:2026, mes:11, valor:30000,   status:'prev', ref:'15ª parcela — Projeto básico do mobiliário da recepção e ADM', nota:'Entrega em 15/10/2026 (prazo contratual 14/10)'},
+  {c:'c2', ano:2026, mes:12, valor:45000,   status:'prev', ref:'18ª parcela — Projeto executivo do mobiliário da recepção e ADM', nota:'Entrega prevista para o fim de outubro (prazo 30/10)'},
+  {c:'c2', ano:2027, mes:1,  valor:265000,  status:'prev', ref:'19ª + 20ª parcelas — Projeto educativo da exposição temporária + Modelagem de Gestão'},
+  {c:'c2', ano:2027, mes:6,  valor:85000,   status:'prev', ref:'21ª parcela — Apoio ao Plano de Comunicação'},
+  {c:'c2', ano:2027, mes:9,  valor:85000,   status:'prev', ref:'22ª parcela — Consolidação final da assessoria'},
+];
 
-const totalGeral = allItems.reduce((s,i)=>s+i.valor,0);
-const totalPago = allItems.filter(i=>i.pago).reduce((s,i)=>s+i.valor,0);
-const totalPendente = totalGeral - totalPago;
-const pctPago = totalPago/totalGeral*100;
+// Entregáveis
+const EIXOS = {
+  'Eixo Museológico': { c:'c1', items:[
+    {item:1, desc:'Plano de Trabalho', prazo:'2025-01-15', valor:150000, entrega:'Entregue no prazo', pago:true, receb:'Recebido em fev/2025'},
+    {item:2, desc:'Concepção Estratégica', prazo:'2025-03-16', valor:100000, entrega:'Entregue no prazo', pago:true, receb:'Recebido em mai/2025'},
+    {item:3, desc:'Mapeamento de Repertório', prazo:'2025-05-15', valor:250000, entrega:'Entregue em 25/02/2026', pago:true, receb:'Recebido em abr/2026 (lote)', lote:true},
+    {item:4, desc:'Plano Museológico', prazo:'2025-09-02', valor:300000, entrega:'Entregue em 19/02/2026', pago:true, receb:'Recebido em abr/2026 (lote)', lote:true},
+    {item:5, desc:'Projeto Educativo', prazo:'2025-09-12', valor:150000, entrega:'Entregue em 19/02/2026', pago:true, receb:'Recebido em abr/2026 (lote)', lote:true},
+    {item:6, desc:'Projeto de Acessibilidade', prazo:'2025-09-12', valor:250000, entrega:'Entregue em 19/02/2026', pago:true, receb:'Recebido em abr/2026 (lote)', lote:true},
+    {item:7, desc:'Entregas Físicas de Acessibilidade', prazo:'2025-09-12', valor:360000, entrega:'Não entregue — condicionado à execução física das obras e instalação dos elementos estruturais de suporte', pago:false, bloqueado:true, receb:'Recebimento previsto para 2027 (cronograma original: dez/2026)'},
+    {item:8, desc:'Relatório Final', prazo:'2025-09-12', valor:20000, entrega:'Não entregue — dependente da consolidação de todas as etapas físicas e documentais precedentes', pago:false, bloqueado:true, receb:'Recebimento previsto para 2027 (cronograma original: dez/2026)'},
+  ]},
+  'Eixo Gestão e Governança': { c:'c1', items:[
+    {item:1, desc:'Análise de Contexto Político-Econômico', prazo:'2025-02-14', valor:200000, entrega:'Entregue no prazo', pago:true, receb:'Recebido em abr/2025'},
+    {item:2, desc:'Pesquisa de Mercado', prazo:'2025-04-15', valor:150000, entrega:'Entregue no prazo', pago:true, receb:'Recebido em jun/2025'},
+    {item:3, desc:'Plano de Gestão e Governança do Museu', prazo:'2025-06-14', valor:250000, entrega:'Entregue em 08/04/2026', pago:true, receb:'Recebido em jun/2026'},
+    {item:4, desc:'Programa de Capacitação de Equipe', prazo:'2025-09-02', valor:150000, entrega:'Entregue em 25/02/2026', pago:true, receb:'Recebido em abr/2026 (lote)', lote:true},
+    {item:5, desc:'Estratégia e Plano Detalhado de Marca e Comunicação', prazo:'2025-09-12', valor:200000, entrega:'Entregue em 19/02/2026', pago:true, receb:'Recebido em abr/2026 (lote)', lote:true},
+    {item:6, desc:'Relatório Final', prazo:'2025-09-12', valor:20000, entrega:'Entregue em 08/04/2026', pago:true, receb:'Recebido em jun/2026'},
+  ]},
+  '4º Aditivo de Contrato': { c:'c2', items:[
+    {item:'17ª Parcela', desc:'Assessoria técnica do Plano de Gestão — Desenho de Governança e Modelo de Gestão', prazo:'2026-09-15', valor:85000, entrega:'Entregue — falta faturar. Produto 15 do Anexo II do 4º Termo Aditivo.', pago:false, st:{cls:'ok', txt:'entregue · a faturar', color:'var(--ok)'}, receb:'Recebimento previsto: out/2026, após o faturamento'},
+    {item:'16ª Parcela', desc:'Vídeo Institucional de Divulgação do Projeto', prazo:'2026-09-30', valor:30000, entrega:'Não entregue. A gravação com o governador e a secretária só foi possível em 08/10/2026. Prévia prevista para 22/10 e versão final cerca de 15 dias depois (~06/11). Produto 16 do Anexo II do 4º Termo Aditivo.', pago:false, st:{cls:'late', txt:'atrasado · final ~06/11', color:'var(--late)'}, receb:'Recebimento planejado para out/2026 — com a versão final em ~06/11, tende a ficar para nov/2026 ou depois'},
+    {item:'15ª Parcela', desc:'Projeto básico do mobiliário para áreas do Receptivo e do Administrativo', prazo:'2026-10-14', valor:30000, entrega:'Entrega em 15/10/2026 (prazo contratual 14/10/2026). Produto 17 do Anexo II do 4º Termo Aditivo.', pago:false, st:{cls:'ok', txt:'entrega hoje (15/10)', color:'var(--ok)'}, receb:'Recebimento previsto: nov/2026'},
+    {item:'18ª Parcela', desc:'Projeto executivo do mobiliário para áreas do Receptivo e do Administrativo', prazo:'2026-10-30', valor:45000, entrega:'Entrega prevista para o fim de outubro/2026. Prazo confirmado no 4º Termo Aditivo — Produto 18 do Anexo II.', pago:false, receb:'Recebimento previsto: dez/2026'},
+    {item:'19ª Parcela', desc:'Projeto educativo da exposição temporária', prazo:'2026-11-11', valor:180000, entrega:'Prazo confirmado no 4º Termo Aditivo — Produto 19 do Anexo II.', pago:false, receb:'Recebimento previsto: jan/2027 (junto com a 20ª)'},
+    {item:'20ª Parcela', desc:'Assessoria técnica do Plano de Gestão — Modelagem de Gestão de Governança e Operação do Museu', prazo:'2026-11-30', valor:85000, entrega:'Prazo confirmado no 4º Termo Aditivo — Produto 20 do Anexo II.', pago:false, receb:'Recebimento previsto: jan/2027 (junto com a 19ª)'},
+    {item:'21ª Parcela', desc:'Assessoria técnica do Plano de Gestão — Apoio técnico na implementação do Plano de Comunicação', prazo:'2027-04-30', valor:85000, entrega:'Prazo confirmado no 4º Termo Aditivo — Produto 21 do Anexo II.', pago:false, receb:'Recebimento previsto: jun/2027'},
+    {item:'22ª Parcela', desc:'Assessoria técnica do Plano de Gestão — Consolidação final da assessoria de implementação do Plano Museológico e do Plano de Gestão', prazo:'2027-07-31', valor:85000, entrega:'Prazo confirmado no 4º Termo Aditivo — Produto 22 do Anexo II.', pago:false, receb:'Recebimento previsto: set/2027'},
+  ]},
+};
 
-document.getElementById('genDate').textContent = TODAY.toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'});
-document.getElementById('totalItensMeta').textContent = allItems.length;
+// Orçamento 2026 — aba mxm
+const MXM = [
+  ['Despesa com Pessoal','Gestão_MUSEDUCA OEI','13º Salário',59.29,59.29,0,0,null],
+  ['Despesa com Pessoal','Gestão_MUSEDUCA OEI','Seguro de vida',84.84,84.84,0,0,'SUL AMERICA SEGUROS DE PESSOAS E PREVIDENCIA S.A.'],
+  ['Despesa com Pessoal','Gestão_MUSEDUCA OEI','PCMSO/PPRA/Outros de Mesma Natureza',25.32,25.32,0,0,'BRH SAUDE OCUPACIONAL LTDA'],
+  ['Despesa com Pessoal','Gestão_MUSEDUCA OEI','Plano de Saúde',480.33,480.33,0,0,'SUL AMERICA COMPANHIA DE SEGURO SAUDE'],
+  ['Despesa com Pessoal','Gestão_MUSEDUCA OEI','Salários & Encargos',20025.10,20025.10,0,0,'Salários & Encargos'],
+  ['Despesa com Pessoal','Gestão_MUSEDUCA OEI','Taxas Diversas',63.00,63.00,0,0,'BENEFICIO SOCIAL FAMILIAR'],
+  ['Despesa com Pessoal','Gestão_MUSEDUCA OEI','Vale Alimentação/Refeição',-2.00,-2.00,0,0,null],
+  ['Despesa com Pessoal','Gestão_MUSEDUCA OEI','Vale Alimentação/Refeição',2750.00,2750.00,0,0,'TICKET SERVIÇOS SA'],
+  ['Despesa com Pessoal','Gestão_MUSEDUCA OEI','Vale Transporte',-582.00,-601.40,0,19.40,null],
+  ['Despesa com Pessoal','Gestão_MUSEDUCA OEI','Vale Transporte',931.20,931.20,0,0,'CBD BILHETE DIGITAL S/A - JAE'],
+  ['DIR','Financeiro DIR_MUSEDUCA OEI','Consultoria Especializada',322268.96,0,0,322268.96,null],
+  ['DIR','Financeiro DIR_MUSEDUCA OEI','Consultoria Especializada',74250.00,74250.00,0,0,'LIS SOLUCOES INTEGRADAS LTDA'],
+  ['DIR','Financeiro DIR_MUSEDUCA OEI','Consultoria Especializada',35000.00,35000.00,0,0,'CT PROJETOS & CONSULTORIA INTERNACIONAL LTDA'],
+  ['DIR','Financeiro DIR_MUSEDUCA OEI','Consultoria Especializada',167616.00,125712.00,41904.00,0,'BEMS CONSULTING LTDA'],
+  ['DIR','Financeiro DIR_MUSEDUCA OEI','Plano de Saúde',28973.44,0,0,28973.44,null],
+  ['DIR','Financeiro DIR_MUSEDUCA OEI','Plano de Saúde',162.59,162.59,0,0,'SUL AMERICA COMPANHIA DE SEGURO SAUDE'],
+  ['DIR','Financeiro DIR_MUSEDUCA OEI','Plano de Saúde',27863.97,27863.97,0,0,'BRADESCO SAUDE S/A'],
+  ['Atividade Regular','Departamento Pessoal_MUSEDUCA OEI','PCMSO/PPRA/Outros de Mesma Natureza',137.94,137.94,0,0,'BRH SAUDE OCUPACIONAL LTDA'],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','13º Salário',29.45,0,0,29.45,null],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Coordenação IDG',245000.00,190000.00,55000.00,0,'IDG (coordenação)'],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Designer',16000.00,8000.00,8000.00,0,'PRC DESIGN E COMUNICACAO LTDA'],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Produção de Vídeo',23000.00,0,23000.00,0,'PLUMA AGENCIA E PRODUTORA AUDIOVISUAL LTDA'],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Projeto Expográfico',34300.00,17150.00,17150.00,0,'JUNTA - ARQUITETURA, URBANISMO E DESIGN LTDA'],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Salários & Encargos',10001.94,10001.94,0,0,null],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Serviços Técnicos Especializados',9000.00,9000.00,0,0,'LIMA COMUNICACAO CULTURAL LTDA'],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Táxi e Similares',5999.90,0,0,5999.90,null],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Táxi e Similares',2540.73,2540.73,0,0,'UBER DO BRASIL TECNOLOGIA LTDA'],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Passagem',23613.77,0,0,23613.77,null],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Passagem',19798.97,19798.97,0,0,'LEVVA VIAGENS LTDA'],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Diária de Viagem',1800.00,0,0,1800.00,null],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Produção Artística',48000.00,0,24000.00,24000.00,null],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Produção Artística',24000.00,24000.00,0,0,'RICARDO SILVA DE AQUINO'],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Hospedagem',16000.00,0,0,16000.00,null],
+  ['MUSEDUCA','Gestão_MUSEDUCA OEI','Hospedagem',407.90,407.90,0,0,'RIOTRAVEL TURISMO LTDA'],
+  ['MUSEDUCA','Receita_MUSEDUCA OEI','Despesas Tributárias',3277.72,2786.47,0,491.25,null],
+  ['MUSEDUCA','Receita_MUSEDUCA OEI','Despesas Tributárias',216.77,216.77,0,0,'IOF aplicação financeira'],
+  ['MUSEDUCA','Receita_MUSEDUCA OEI','Despesas Tributárias',5908.96,5908.96,0,0,'IR aplicação financeira'],
+  ['MUSEDUCA','Receita_MUSEDUCA OEI','Tributos Sobre Receitas',191520.00,191520.00,0,0,null],
+].map(r => ({projeto:r[0], cc:r[1].replace('_MUSEDUCA OEI',''), conta:r[2], orc:r[3], real:r[4], comp:r[5], saldo:r[6], forn:r[7]}));
 
-// ---------- estado dos filtros ----------
-let currentFase = 'all';       // 'all' | 'Fase 1' | 'Fase 2'
-let currentStatus = 'todos'; // 'pendentes' | 'todos'
+// Fluxo 2026 — aba Fluxo
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const FLUXO = {
+  entradas: [114615,664,654,1250460,12614,283877,16500,13496,10495,115000,30000,45000],
+  saidas:   [12389,11581,15074,158944,11302,34601,94552,301864,110937,168404,160604,280272],
+  saldo:    [102226,91309,76889,1168406,1169718,1418993,1340942,1052574,952132,898727,768123,532851],
+  realizadoAte: 8, // índice (set) — out em diante é projeção
+  reservaC1: 342851,
+  reservaC2: 190000,
+};
 
-function scopedItems(fase){
-  return fase === 'all' ? allItems : allItems.filter(i => i.fase === fase);
+// =====================================================================
+// HELPERS
+// =====================================================================
+const fmt = v => 'R$ ' + Math.round(v).toLocaleString('pt-BR');
+const fmtK = v => { const a=Math.abs(v); const s=v<0?'−':''; if(a>=1e6) return s+'R$ '+(a/1e6).toLocaleString('pt-BR',{maximumFractionDigits:2})+' mi'; if(a>=1e3) return s+'R$ '+Math.round(a/1e3).toLocaleString('pt-BR')+' mil'; return s+'R$ '+Math.round(a); };
+const pct = (a,b) => b ? (a/b*100) : 0;
+const pd = s => s ? new Date(s+'T00:00:00') : null;
+const fdate = d => d ? d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+const ddiff = d => Math.round((d - TODAY)/86400000);
+const MES_ABR = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const mesLabel = r => r.mes ? `${MES_ABR[r.mes-1]}/${r.ano}` : `${r.ano} (mês a definir)`;
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const tip = document.getElementById('tip');
+function showTip(e, html){ tip.innerHTML = html; tip.style.opacity = 1; moveTip(e); }
+function moveTip(e){ const x = Math.min(e.clientX + 14, window.innerWidth - 270); tip.style.left = x+'px'; tip.style.top = (e.clientY + 14)+'px'; }
+function hideTip(){ tip.style.opacity = 0; }
+
+let currentFase = 'all';
+let currentStatus = 'todos';
+const inScope = c => currentFase === 'all' || currentFase === c;
+
+function contratoNums(c){
+  const rs = RECEB.filter(r => r.c === c);
+  const rec = rs.filter(r => r.status === 'rec').reduce((s,r)=>s+r.valor,0);
+  return { total: CONTRATOS[c].valor, rec, pend: CONTRATOS[c].valor - rec,
+           risk: rs.filter(r=>r.status==='risk').reduce((s,r)=>s+r.valor,0) };
 }
 
-// ---------- resumo executivo ----------
-function renderResumo(fase){
-  const items = scopedItems(fase);
-  const total = items.reduce((s,i)=>s+i.valor,0);
-  const pago = items.filter(i=>i.pago).reduce((s,i)=>s+i.valor,0);
-  const pend = total - pago;
-  const pct = total ? (pago/total*100) : 0;
-  const scopeLabel = fase === 'all' ? 'do projeto' : `— ${fase}`;
+// =====================================================================
+// 01 RESUMO
+// =====================================================================
+document.getElementById('posDate').textContent = fdate(TODAY);
+(function(){
+  const nx = RECEB.filter(r => r.status !== 'rec' && r.mes).sort((a,b)=> (a.ano*12+a.mes)-(b.ano*12+b.mes))[0];
+  document.getElementById('nextRec').textContent = `${fmt(nx.valor)} · ${mesLabel(nx)}`;
+})();
 
-  document.getElementById('statTotal').textContent = fmtBRL(total);
-  document.getElementById('statTotalSub').textContent = items.length + ' entregáveis ' + scopeLabel;
-  document.getElementById('statPago').textContent = fmtBRL(pago);
-  document.getElementById('statPagoSub').textContent = items.filter(i=>i.pago).length + ' entregas quitadas';
-  document.getElementById('statPendente').textContent = fmtBRL(pend);
-  document.getElementById('statPendenteSub').textContent = items.filter(i=>!i.pago).length + ' entregas em aberto';
-
-  renderSeal(pct);
-}
-
-// ---------- seal donut ----------
-function renderSeal(pct){
-  const svg = document.getElementById('sealSvg');
-  const cx=64, cy=64, r=52;
-  const circumference = 2*Math.PI*r;
-  const offset = circumference * (1 - pct/100);
+function renderGauge(p){
+  const svg = document.getElementById('gauge');
+  const cx=95, cy=96, r=74;
+  const pol = a => { const rad=(180-a)*Math.PI/180; return [cx + r*Math.cos(rad), cy - r*Math.sin(rad)]; };
+  const arc = (a0,a1) => { const [x0,y0]=pol(a0), [x1,y1]=pol(a1); return `M${x0},${y0} A${r},${r} 0 ${a1-a0>180?1:0} 1 ${x1},${y1}`; };
+  const a = Math.max(0.5, Math.min(180, p*1.8));
   svg.innerHTML = `
-    <circle cx="${cx}" cy="${cy}" r="${r+8}" fill="none" stroke="#6c7178" stroke-width="1" stroke-dasharray="1 5"/>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#61666f" stroke-width="9"/>
-    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#e0b93a" stroke-width="9"
-      stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
-      stroke-linecap="butt" transform="rotate(-90 ${cx} ${cy})"/>
-    <text x="${cx}" y="${cy-4}" text-anchor="middle" class="seal-pct" font-size="21" font-weight="600" fill="#ffffff">${pct.toFixed(1)}%</text>
-    <text x="${cx}" y="${cy+14}" text-anchor="middle" class="seal-pct" font-size="9" fill="#a3a8ae" letter-spacing="1">PAGO</text>
-  `;
+    <path d="${arc(0,180)}" fill="none" stroke="#CFE3F7" stroke-width="14" stroke-linecap="round"/>
+    <path d="${arc(0,a)}" fill="none" stroke="var(--river)" stroke-width="14" stroke-linecap="round"/>
+    <text x="${cx}" y="${cy-14}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="26" font-weight="600" fill="#16233F">${p.toFixed(1).replace('.',',')}%</text>
+    <text x="${cx}" y="${cy+4}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" letter-spacing="1" fill="#6A83A6">RECEBIDO</text>`;
 }
 
-// ---------- visão por fase (sempre mostra as duas, destaca a selecionada) ----------
-function renderFaseRows(fase){
-  const container = document.getElementById('faseRows');
-  container.innerHTML = '';
-  const fases = ['Fase 1', 'Fase 2'];
-  fases.forEach(f => {
-    const items = allItems.filter(i => i.fase === f);
-    const total = items.reduce((s,i)=>s+i.valor,0);
-    const pago = items.filter(i=>i.pago).reduce((s,i)=>s+i.valor,0);
-    const pend = total - pago;
-    const pctP = total ? (pago/total*100) : 0;
-    const eixosDaFase = [...new Set(items.map(i=>i.eixo))];
-    const row = document.createElement('div');
-    let cls = 'fase-row';
-    if(fase !== 'all'){ cls += (f === fase) ? ' selected' : ' dimmed'; }
-    row.className = cls;
-    row.innerHTML = `
-      <div class="fase-name">
-        <span class="fase-tag">${f}</span>
-        <div>${FASE_LABEL[f]}</div>
-        <small>${eixosDaFase.join(' · ')}<br>${items.length} entregáveis · ${fmtBRL(total)}</small>
-      </div>
-      <div class="fase-track">
-        <div class="bar-fill" style="width:${pctP}%"></div>
-        <div class="bar-fill pending-fill" style="width:${100-pctP}%"></div>
-      </div>
-      <div class="fase-figures">
-        <span class="pct">${pctP.toFixed(1)}% pago</span><br>
-        <span class="p">pago ${fmtBRL(pago)}</span><br>
-        <span class="q">pendente ${fmtBRL(pend)}</span>
-      </div>
-    `;
-    container.appendChild(row);
-  });
-}
+function renderResumo(){
+  const cs = Object.keys(CONTRATOS).filter(inScope);
+  const n = cs.map(contratoNums).reduce((a,b)=>({total:a.total+b.total, rec:a.rec+b.rec, pend:a.pend+b.pend, risk:a.risk+b.risk}), {total:0,rec:0,pend:0,risk:0});
+  const nItens = Object.values(EIXOS).filter(e=>inScope(e.c)).reduce((s,e)=>s+e.items.length,0);
+  const pend27 = RECEB.filter(r => cs.includes(r.c) && r.status!=='rec' && r.ano===2027).reduce((s,r)=>s+r.valor,0);
+  document.getElementById('kTotal').textContent = fmt(n.total);
+  document.getElementById('kTotalSub').innerHTML = (currentFase==='all' ? '2 contratos · ' : '') + `${nItens} entregáveis`;
+  document.getElementById('kRec').textContent = fmt(n.rec);
+  document.getElementById('kRecSub').textContent = `${pct(n.rec,n.total).toFixed(1).replace('.',',')}% do contratado`;
+  document.getElementById('kPend').textContent = fmt(n.pend);
+  document.getElementById('kPendSub').innerHTML = `${fmt(n.pend - pend27)} em 2026 · ${fmt(pend27)} em 2027` + (n.risk ? `<br><span style="color:var(--late)">${fmt(n.risk)} em risco (vídeo institucional)</span>` : '');
+  renderGauge(pct(n.rec, n.total));
 
-// ---------- lista de entregáveis (agrupada por eixo, filtrada por fase + status) ----------
-function renderLedger(fase, status){
-  const outer = document.getElementById('pendRows');
-  outer.innerHTML = '';
-
-  const title = document.getElementById('ledgerTitle');
-  const faseTxt = fase === 'all' ? '' : ` — ${fase}`;
-  title.textContent = (status === 'pendentes' ? 'Entregáveis pendentes' : 'Todos os entregáveis') + ' — agrupados por eixo' + faseTxt;
-
-  let scope = scopedItems(fase);
-  if(status === 'pendentes'){ scope = scope.filter(i => !i.pago); }
-
-  if(scope.length === 0){
-    outer.innerHTML = `<div class="ledger-item"><div class="ledger-summary" style="cursor:default"><div style="color:var(--text-dim); grid-column: 1 / -1;">Nenhum entregável nesta seleção.</div></div></div>`;
-    return;
-  }
-
-  function renderRow(target, it, statusColor, tagHtml, prazoHtml, detailsExtraHtml){
+  const strip = document.getElementById('faseStrip');
+  strip.innerHTML = '';
+  Object.entries(CONTRATOS).forEach(([c, ct]) => {
+    const x = contratoNums(c);
+    const p = pct(x.rec, x.total);
     const div = document.createElement('div');
-    div.className = 'ledger-item';
+    div.className = 'card fase-card' + (currentFase==='all' ? '' : (currentFase===c ? ' sel' : ' dim'));
     div.innerHTML = `
-      <div class="ledger-summary" style="color:${statusColor}">
-        <div class="ledger-prazo">${prazoHtml}</div>
-        <div class="ledger-valor">${fmtBRL(it.valor)}</div>
-        <div class="ledger-desc-inline">${it.desc}</div>
-        <button type="button" class="ledger-toggle" aria-label="Ver detalhes">+</button>
-      </div>
-      <div class="ledger-details">
-        <div class="ledger-desc-full"><span class="ledger-tag-wrap">${tagHtml}</span><span class="eixo-tiny">${it.fase} · ${it.eixo} · item ${it.item}</span>${it.status_entrega ? `<span class="note">${it.status_entrega}</span>` : ''}${it.nota_escopo ? `<span class="note">${it.nota_escopo}</span>` : ''}${detailsExtraHtml || ''}</div>
-      </div>
-    `;
-    const btn = div.querySelector('.ledger-toggle');
-    const details = div.querySelector('.ledger-details');
-    const summary = div.querySelector('.ledger-summary');
-    function toggle(){
-      const isOpen = details.classList.toggle('open');
-      btn.classList.toggle('open', isOpen);
-      btn.textContent = isOpen ? '–' : '+';
+      <div class="fase-top"><span class="fase-tag">${ct.fase} · ${ct.nome}</span><span class="fase-pct">${p.toFixed(1).replace('.',',')}%</span></div>
+      <div class="fase-name">${ct.desc}</div>
+      <div class="track"><span style="width:${p}%;background:var(--river)"></span><span style="width:${pct(x.risk,x.total)}%;background:var(--late);opacity:.75"></span><span style="flex:1;background:#E8D9B5"></span></div>
+      <div class="fase-fig"><span>contratado <b>${fmt(x.total)}</b></span><span style="color:var(--river)">recebido ${fmt(x.rec)}</span><span style="color:var(--gold)">a receber ${fmt(x.pend)}</span></div>`;
+    div.addEventListener('click', () => setFase(currentFase === c ? 'all' : c));
+    strip.appendChild(div);
+  });
+}
+
+// =====================================================================
+// 02 RECEITAS
+// =====================================================================
+const expandedRec = new Set();
+function renderReceitas(){
+  const t = document.getElementById('recTable');
+  const anos = [2025, 2026, 2027];
+  let h = `<thead><tr><th>Contrato / parcela</th>${anos.map(a=>`<th>${a}</th>`).join('')}<th>Total</th><th>Recebido</th><th>A receber</th></tr></thead><tbody>`;
+  const tot = {2025:0,2026:0,2027:0,total:0,rec:0,pend:0};
+  Object.entries(CONTRATOS).filter(([c])=>inScope(c)).forEach(([c, ct]) => {
+    const rs = RECEB.filter(r=>r.c===c);
+    const byAno = a => rs.filter(r=>r.ano===a).reduce((s,r)=>s+r.valor,0);
+    const n = contratoNums(c);
+    anos.forEach(a => tot[a] += byAno(a)); tot.total += n.total; tot.rec += n.rec; tot.pend += n.pend;
+    const open = expandedRec.has(c);
+    h += `<tr class="l0"><td><button class="tg ${open?'open':''}" data-k="${c}">${open?'−':'+'}</button>${ct.fase} · ${ct.nome}</td>
+      ${anos.map(a=>`<td>${byAno(a)?fmt(byAno(a)):'<span class="dim">—</span>'}</td>`).join('')}
+      <td>${fmt(n.total)}</td><td class="pos">${n.rec?fmt(n.rec):'—'}</td><td>${fmt(n.pend)}</td></tr>`;
+    if(open){
+      rs.forEach(r => {
+        const chip = r.status==='rec' ? '<span class="chip rec">recebido</span>' : r.status==='risk' ? '<span class="chip risk">em risco</span>' : '<span class="chip prev">previsto</span>';
+        h += `<tr class="l1"><td>${mesLabel(r)} — ${esc(r.ref)} ${chip}${r.nota?`<br><span style="font-size:11.5px;color:var(--text-dim);font-style:italic">${esc(r.nota)}</span>`:''}</td>
+          ${anos.map(a=>`<td class="${r.status==='rec'?'':'proj'}">${r.ano===a?fmt(r.valor):''}</td>`).join('')}
+          <td>${fmt(r.valor)}</td><td class="pos">${r.status==='rec'?fmt(r.valor):''}</td><td>${r.status!=='rec'?fmt(r.valor):''}</td></tr>`;
+      });
     }
-    btn.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
-    summary.addEventListener('click', toggle);
-    target.appendChild(div);
+  });
+  h += `<tr class="total"><td>Total</td>${anos.map(a=>`<td>${fmt(tot[a])}</td>`).join('')}<td>${fmt(tot.total)}</td><td>${fmt(tot.rec)}</td><td>${fmt(tot.pend)}</td></tr>`;
+  if(currentFase !== 'c2'){
+    h += `<tr class="note-row"><td colspan="7">Além das parcelas contratuais, o caixa de 2026 registrou ${fmt(183375)} em rendimentos e outras entradas (inclui ${fmt(114615)} em janeiro). Ver seção 05.</td></tr>`;
   }
-
-  const eixoOrder = Object.keys(DATA.eixos).filter(e => fase === 'all' || FASE_MAP[e] === fase);
-  let firstGroup = true;
-
-  eixoOrder.forEach(eixo => {
-    const eixoItems = scope.filter(i => i.eixo === eixo);
-    if(eixoItems.length === 0) return;
-
-    const total = eixoItems.reduce((s,i)=>s+i.valor,0);
-    const pago = eixoItems.filter(i=>i.pago).reduce((s,i)=>s+i.valor,0);
-    const pend = total - pago;
-    const pctP = total ? (pago/total*100) : 0;
-
-    const group = document.createElement('div');
-    group.className = 'ledger-eixo-group';
-
-    const header = document.createElement('div');
-    header.className = 'ledger-eixo-header' + (firstGroup ? ' first' : '');
-    firstGroup = false;
-    header.innerHTML = `
-      <div class="eixo-name">${eixo}<small>${eixoItems.length} entregáveis · ${fmtBRL(total)}</small></div>
-      <div class="bar-track">
-        <div class="bar-fill" style="width:${pctP}%"></div>
-        <div class="bar-fill pending-fill" style="width:${100-pctP}%"></div>
-      </div>
-      <div class="eixo-figures">
-        <span class="p">pago ${fmtBRL(pago)}</span><br>
-        <span class="q">pendente ${fmtBRL(pend)}</span>
-      </div>
-      <button type="button" class="ledger-toggle" aria-label="Ver entregáveis">+</button>
-    `;
-    group.appendChild(header);
-
-    const itemsWrap = document.createElement('div');
-    itemsWrap.className = 'ledger-eixo-items';
-    group.appendChild(itemsWrap);
-
-    const btn = header.querySelector('.ledger-toggle');
-    function toggleGroup(){
-      const isOpen = itemsWrap.classList.toggle('open');
-      btn.classList.toggle('open', isOpen);
-      btn.textContent = isOpen ? '–' : '+';
-    }
-    btn.addEventListener('click', (e) => { e.stopPropagation(); toggleGroup(); });
-    header.addEventListener('click', toggleGroup);
-
-    if(eixo === '4º Aditivo de Contrato'){
-      // ordenar TODOS os produtos deste eixo por data (melhor data disponível), sem agrupar por categoria
-      function effectiveDate(it){
-        if(it.pago) return parseDate(it.prazo);
-        if(it.negociacao) return parseDate(it.prazo_datas[it.prazo_datas.length-1].data);
-        if(it.prazo_incerto) return parseDate(it.prazo_incerto.split(' ')[0].split('/').reverse().join('-'));
-        return parseDate(it.prazo);
-      }
-      const ordemManual = ['17ª Parcela','16ª Parcela','15ª Parcela','18ª Parcela','19ª Parcela','20ª Parcela','21ª Parcela','22ª Parcela'];
-      const ordered = [...eixoItems].sort((a,b) => ordemManual.indexOf(a.item) - ordemManual.indexOf(b.item));
-
-      ordered.forEach(it => {
-        if(it.pago){
-          renderRow(itemsWrap, it, 'var(--status-paid)', `<span class="ledger-tag tag-paid">pago</span>`, `${fmtDateBR(parseDate(it.prazo))}`);
-        } else if(it.negociacao){
-          const hist = it.prazo_datas.map((p, idx) => {
-            const isLast = idx === it.prazo_datas.length - 1;
-            return `<div class="prazo-hist-row ${isLast ? 'current' : ''}"><span class="d">${fmtDateBR(parseDate(p.data))}</span> — ${p.label}</div>`;
-          }).join('');
-          renderRow(itemsWrap, it, 'var(--status-review)',
-            `<span class="ledger-tag tag-negociacao">proposta · SEDUC</span>`,
-            `${fmtDateBR(parseDate(it.prazo_datas[it.prazo_datas.length-1].data))}`,
-            `<div class="prazo-hist">${hist}</div>`
-          );
-        } else if(it.prazo_incerto){
-          renderRow(itemsWrap, it, 'var(--status-review)',
-            `<span class="ledger-tag tag-unclear">a confirmar</span>`,
-            `${it.prazo_incerto}`,
-            `<div class="note" style="margin-top:8px">A CONFIRMAR</div>`
-          );
-        } else {
-          const d = parseDate(it.prazo);
-          const dd = daysDiff(d);
-          let tag, statusColor;
-          if(dd < 0){
-            tag = `<span class="ledger-tag tag-overdue">atrasado ${Math.abs(dd)}d</span>`;
-            statusColor = 'var(--status-overdue)';
-          } else if(dd <= 45){
-            tag = `<span class="ledger-tag tag-soon">em ${dd}d</span>`;
-            statusColor = 'var(--status-ontime)';
-          } else {
-            tag = `<span class="ledger-tag tag-normal">em ${dd}d</span>`;
-            statusColor = 'var(--status-ontime)';
-          }
-          renderRow(itemsWrap, it, statusColor, tag, `${fmtDateBR(d)}`);
-        }
-      });
-
-    } else {
-      const pagos = eixoItems.filter(i => i.pago)
-        .map(i => ({...i, _d: parseDate(i.prazo)}))
-        .sort((a,b) => (a._d||0) - (b._d||0));
-      const emNegociacao = eixoItems.filter(i => !i.pago && i.negociacao);
-      const comDataIncerta = eixoItems.filter(i => !i.pago && i.prazo_incerto && !i.negociacao);
-      const comData = eixoItems.filter(i => !i.pago && i.prazo && !i.prazo_incerto && !i.negociacao)
-        .map(i => ({...i, _d: parseDate(i.prazo)}))
-        .sort((a,b) => a._d - b._d);
-
-      // 1) itens em negociação ativa — proposta aguardando SEDUC (amarelo)
-      emNegociacao.forEach(it => {
-        const hist = it.prazo_datas.map((p, idx) => {
-          const isLast = idx === it.prazo_datas.length - 1;
-          return `<div class="prazo-hist-row ${isLast ? 'current' : ''}"><span class="d">${fmtDateBR(parseDate(p.data))}</span> — ${p.label}</div>`;
-        }).join('');
-        renderRow(itemsWrap, it, 'var(--status-review)',
-          `<span class="ledger-tag tag-negociacao">proposta · SEDUC</span>`,
-          `${fmtDateBR(parseDate(it.prazo_datas[it.prazo_datas.length-1].data))}`,
-          `<div class="prazo-hist">${hist}</div>`
-        );
-      });
-
-      // 2) datas incertas sem proposta ativa — a confirmar (amarelo)
-      comDataIncerta.forEach(it => {
-        renderRow(itemsWrap, it, 'var(--status-review)',
-          `<span class="ledger-tag tag-unclear">a confirmar</span>`,
-          `${it.prazo_incerto}`,
-          `<div class="note" style="margin-top:8px">A CONFIRMAR</div>`
-        );
-      });
-
-      // 3) datas concretas pendentes — verde (no prazo) ou vermelho (atrasado)
-      comData.forEach(it => {
-        const dd = daysDiff(it._d);
-        let tag, statusColor;
-        if(dd < 0){
-          tag = `<span class="ledger-tag tag-overdue">atrasado ${Math.abs(dd)}d</span>`;
-          statusColor = 'var(--status-overdue)';
-        } else if(dd <= 45){
-          tag = `<span class="ledger-tag tag-soon">em ${dd}d</span>`;
-          statusColor = 'var(--status-ontime)';
-        } else {
-          tag = `<span class="ledger-tag tag-normal">em ${dd}d</span>`;
-          statusColor = 'var(--status-ontime)';
-        }
-        renderRow(itemsWrap, it, statusColor, tag, `${fmtDateBR(it._d)}`);
-      });
-
-      // 4) já pagos/entregues (só aparece em "todos") — azul
-      pagos.forEach(it => {
-        renderRow(itemsWrap, it, 'var(--status-paid)', `<span class="ledger-tag tag-paid">pago</span>`, `${fmtDateBR(it._d)}`);
-      });
-    }
-
-    outer.appendChild(group);
-  });
+  h += '</tbody>';
+  t.innerHTML = h;
+  t.querySelectorAll('.tg').forEach(b => b.addEventListener('click', () => { const k=b.dataset.k; expandedRec.has(k)?expandedRec.delete(k):expandedRec.add(k); renderReceitas(); }));
 }
 
-// ---------- análises (visão geral, não filtrada) ----------
-function renderAnalysis(){
-  const container = document.getElementById('analysisGrid');
-  container.innerHTML = '';
+// =====================================================================
+// 03 ENTREGÁVEIS
+// =====================================================================
+const openEixos = new Set(['4º Aditivo de Contrato']);
+function itemStatus(it){
+  if(it.st) return it.st;
+  if(it.pago) return {cls:'paid', txt:'pago', color:'var(--river)'};
+  if(it.bloqueado) return {cls:'blk', txt:'vencido · depende de obra', color:'var(--late)'};
+  const dd = ddiff(pd(it.prazo));
+  if(dd < 0) return {cls:'late', txt:`atrasado ${Math.abs(dd)}d`, color:'var(--late)'};
+  if(dd <= 45) return {cls:'soon', txt:`vence em ${dd}d`, color:'var(--warn)'};
+  return {cls:'ok', txt:`em ${dd}d`, color:'var(--ok)'};
+}
+function renderLedger(){
+  const L = document.getElementById('ledger');
+  L.innerHTML = '';
+  const faseTxt = currentFase==='all' ? '' : ` — ${CONTRATOS[currentFase].fase}`;
+  document.getElementById('ledgerTitle').textContent = (currentStatus==='pendentes' ? 'Entregáveis pendentes' : 'Entregáveis') + faseTxt;
+  let any = false;
+  Object.entries(EIXOS).filter(([,e])=>inScope(e.c)).forEach(([eixo, e]) => {
+    let items = e.items;
+    if(currentStatus === 'pendentes') items = items.filter(i=>!i.pago);
+    if(!items.length) return;
+    any = true;
+    const total = e.items.reduce((s,i)=>s+i.valor,0);
+    const pago = e.items.filter(i=>i.pago).reduce((s,i)=>s+i.valor,0);
+    const late = e.items.filter(i=>!i.pago && itemStatus(i).cls==='late').reduce((s,i)=>s+i.valor,0);
+    const p = pct(pago,total);
+    const open = openEixos.has(eixo);
+    const g = document.createElement('div'); g.className = 'lg-group';
+    g.innerHTML = `
+      <div class="lg-head">
+        <button class="tg ${open?'open':''}">${open?'−':'+'}</button>
+        <div class="nm">${eixo}<small>${CONTRATOS[e.c].fase} · ${e.items.length} entregáveis · ${fmt(total)} nominais</small></div>
+        <div class="track"><span style="width:${p}%;background:var(--river)"></span><span style="width:${pct(late,total)}%;background:var(--late);opacity:.75"></span><span style="flex:1;background:#E8D9B5"></span></div>
+        <div class="fig"><span class="r">pago ${fmt(pago)}</span><br><span class="p">pendente ${fmt(total-pago)}</span>${late?`<br><span style="color:var(--late)">atrasado ${fmt(late)}</span>`:''}</div>
+      </div>
+      <div class="lg-items ${open?'open':''}">
+        <div class="lg-cols"><div>Prazo</div><div>Valor</div><div>Entregável</div><div style="text-align:right">Status</div><div></div></div>
+      </div>`;
+    const wrap = g.querySelector('.lg-items');
+    let ordered = [...items];
+    if(e.c === 'c1') ordered.sort((a,b)=> (a.pago-b.pago) || (pd(a.prazo)-pd(b.prazo)));
+    ordered.forEach(it => {
+      const st = itemStatus(it);
+      const row = document.createElement('div'); row.className = 'lg-row';
+      row.innerHTML = `
+        <div class="lg-sum" style="box-shadow:inset 3px 0 0 ${st.color}">
+          <div class="d">${fdate(pd(it.prazo))}</div>
+          <div class="v">${fmt(it.valor)}</div>
+          <div class="t">${esc(it.desc)}</div>
+          <div class="s"><span class="st ${st.cls}">${st.txt}</span></div>
+          <button class="tg">+</button>
+        </div>
+        <div class="lg-det">
+          <div class="meta">${CONTRATOS[e.c].fase} · ${eixo} · ${typeof it.item==='number' ? 'item '+it.item : it.item}</div>
+          <div>${esc(it.entrega)}</div>
+          <div class="rb ${it.pago?'':'warn'}">${esc(it.receb)}${it.lote?' — o lote de seis produtos (R$ 1.300.000 nominais) foi recebido como R$ 1.250.000; diferença de R$ 50 mil a conciliar.':''}</div>
+        </div>`;
+      const sum = row.querySelector('.lg-sum'), det = row.querySelector('.lg-det'), b = row.querySelector('.tg');
+      sum.addEventListener('click', () => { const o = det.classList.toggle('open'); b.classList.toggle('open',o); b.textContent = o?'−':'+'; });
+      wrap.appendChild(row);
+    });
+    const head = g.querySelector('.lg-head'), hb = head.querySelector('.tg');
+    head.addEventListener('click', () => { const o = wrap.classList.toggle('open'); hb.classList.toggle('open',o); hb.textContent = o?'−':'+'; o?openEixos.add(eixo):openEixos.delete(eixo); });
+    L.appendChild(g);
+  });
+  if(!any) L.innerHTML = '<div style="padding:18px;color:var(--text-dim)">Nenhum entregável nesta seleção.</div>';
+}
 
-  const pendentes = allItems.filter(i=>!i.pago);
-  const aditivo = DATA.eixos['4º Aditivo de Contrato'];
-  const totalAditivo = aditivo.reduce((s,i)=>s+i.valor,0);
-  const museo = DATA.eixos['Eixo Museológico'];
-  const museoPendFisico = museo.filter(i=>!i.pago).reduce((s,i)=>s+i.valor,0);
-  const maiorPendente = [...pendentes].sort((a,b)=>b.valor-a.valor)[0];
-  const overdue = pendentes.filter(i=>i.prazo && (parseDate(i.prazo) - TODAY) < 0);
-  const overdueTotal = overdue.reduce((s,i)=>s+i.valor,0);
-
-  const cards = [
-    {
-      label: 'risco', cls:'risk',
-      title: 'Pendência ligada a obras físicas, fora do controle direto do projeto',
-      body: `<span class="figure">${fmtBRL(museoPendFisico)}</span> do Eixo Museológico está pendente e depende da execução física das obras de acessibilidade — condição que não depende apenas da equipe de consultoria, mas de cronograma de obra civil. Isso inclui as duas entregas já formalmente com prazo vencido (${fmtBRL(overdueTotal)} em atraso desde 12/09/2025).`
-    },
-    {
-      label: 'atenção', cls:'watch',
-      title: 'Duas frentes distintas de prazo indefinido no 4º Aditivo',
-      body: `<span class="figure">15ª e 18ª parcelas</span> (${fmtBRL(75000)}) têm proposta concreta de adiamento por e-mail (06/07/2026) — aguardando apenas confirmação formal da SEDUC. Já <span class="figure">16ª e 17ª parcelas</span> (${fmtBRL(115000)}) seguem sem qualquer retorno nesta rodada; a data original da SEDUC para a 17ª — 30/06/2026 — já teria vencido, e mesmo a versão revisada (31/08/2026) está a poucas semanas. Vale cobrar posição sobre essas duas junto com a resposta pendente das outras.`
-    },
-    {
-      label: 'concentração', cls:'info',
-      title: `Um único entregável concentra ${(maiorPendente.valor/totalPendente*100).toFixed(1)}% do valor pendente`,
-      body: `<span class="figure">${maiorPendente.desc}</span> (${maiorPendente.eixo}, ${fmtBRL(maiorPendente.valor)}) é isoladamente a maior pendência em valor — ${(maiorPendente.valor/totalPendente*100).toFixed(1)}% do total pendente. O 4º Aditivo como um todo (${fmtBRL(totalAditivo)}) está 100% pendente, o que é esperado por ser a frente contratual mais recente.`
-    },
-    {
-      label: 'estabilidade', cls:'ok',
-      title: 'Eixo de Gestão e Governança está com pagamentos em dia',
-      body: `Todos os 6 entregáveis do Eixo Gestão e Governança já foram entregues e pagos (${fmtBRL(970000)}), incluindo os produtos estruturantes de governança, marca e capacitação. É o único eixo com execução financeira de 100%, e serve de referência de ritmo para os demais.`
-    }
+// =====================================================================
+// 04 DESPESAS
+// =====================================================================
+const D = MXM.reduce((a,r)=>({orc:a.orc+r.orc, real:a.real+r.real, comp:a.comp+r.comp, saldo:a.saldo+r.saldo}), {orc:0,real:0,comp:0,saldo:0});
+(function(){
+  const k = [
+    ['Orçado 2026', D.orc, `${MXM.length} linhas · 4 centros de custo`, ''],
+    ['Realizado', D.real, `${pct(D.real,D.orc).toFixed(1).replace('.',',')}% do orçado`, 'color:var(--s-desp)'],
+    ['Comprometido', D.comp, `${pct(D.comp,D.orc).toFixed(1).replace('.',',')}% do orçado`, 'color:#5C7FC0'],
+    ['Saldo a executar', D.saldo, `${pct(D.saldo,D.orc).toFixed(1).replace('.',',')}% do orçado`, 'color:var(--gold)'],
   ];
+  document.getElementById('despKpis').innerHTML = k.map(([l,v,s,st]) => `<div class="card mini"><div class="k-label">${l}</div><div class="k-val" style="${st}">${fmt(v)}</div><div class="k-sub">${s}</div></div>`).join('');
+  document.getElementById('execBar').innerHTML = `<span style="width:${pct(D.real,D.orc)}%;background:var(--s-desp)"></span><span style="width:${pct(D.comp,D.orc)}%;background:#8FAAD9"></span><span style="flex:1;background:var(--bg-panel-2)"></span>`;
+})();
 
-  cards.forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'analysis-card';
-    div.innerHTML = `<div class="a-label ${c.cls}">${c.label}</div><h3>${c.title}</h3><p>${c.body}</p>`;
-    container.appendChild(div);
+const expandedDesp = new Set();
+function renderDespesas(){
+  const t = document.getElementById('despTable');
+  const sum = arr => arr.reduce((a,r)=>({orc:a.orc+r.orc, real:a.real+r.real, comp:a.comp+r.comp, saldo:a.saldo+r.saldo}), {orc:0,real:0,comp:0,saldo:0});
+  const cells = s => `<td>${fmt(s.orc)}</td><td>${s.real?fmt(s.real):'<span class="dim">—</span>'}</td><td>${s.comp?fmt(s.comp):'<span class="dim">—</span>'}</td><td>${Math.abs(s.saldo)>0.5?fmt(s.saldo):'<span class="dim">—</span>'}</td><td>${s.orc? (pct(s.real+s.comp, s.orc).toFixed(0)+'%') : '—'}<span class="pbar"><span style="width:${Math.max(0,Math.min(100,pct(s.real+s.comp,s.orc)))}%"></span></span></td>`;
+  let h = `<thead><tr><th>Centro de custo / conta / fornecedor</th><th>Orçado</th><th>Realizado</th><th>Comprometido</th><th>Saldo</th><th>Executado</th></tr></thead><tbody>`;
+  const ccs = [...new Set(MXM.map(r=>r.cc))].map(cc => ({cc, rows: MXM.filter(r=>r.cc===cc)})).sort((a,b)=>sum(b.rows).orc - sum(a.rows).orc);
+  ccs.forEach(({cc, rows}) => {
+    const o = expandedDesp.has(cc);
+    h += `<tr class="l0"><td><button class="tg ${o?'open':''}" data-k="${esc(cc)}">${o?'−':'+'}</button>${esc(cc)}</td>${cells(sum(rows))}</tr>`;
+    if(!o) return;
+    const contas = [...new Set(rows.map(r=>r.conta))].map(c=>({c, rows:rows.filter(r=>r.conta===c)})).sort((a,b)=>sum(b.rows).orc-sum(a.rows).orc);
+    contas.forEach(({c, rows:cr}) => {
+      const key = cc+'|'+c, oc = expandedDesp.has(key);
+      const multi = cr.length > 1 || cr[0].forn;
+      h += `<tr class="l1"><td>${multi?`<button class="tg ${oc?'open':''}" data-k="${esc(key)}">${oc?'−':'+'}</button>`:'<span class="tg-spacer"></span>'}${esc(c)}</td>${cells(sum(cr))}</tr>`;
+      if(oc && multi){
+        cr.slice().sort((a,b)=>b.orc-a.orc).forEach(r => {
+          const nm = r.forn ? esc(r.forn) : (r.saldo > 0.5 ? '<i>A contratar (saldo sem fornecedor)</i>' : '<i>Sem fornecedor / ajuste</i>');
+          h += `<tr class="l2"><td>${nm}</td>${cells(r)}</tr>`;
+        });
+      }
+    });
+  });
+  h += `<tr class="total"><td>Total 2026</td>${cells(D)}</tr></tbody>`;
+  t.innerHTML = h;
+  t.querySelectorAll('.tg').forEach(b => b.addEventListener('click', () => { const k=b.dataset.k; expandedDesp.has(k)?expandedDesp.delete(k):expandedDesp.add(k); renderDespesas(); }));
+}
+
+// =====================================================================
+// 05 FLUXO
+// =====================================================================
+const NS = 'http://www.w3.org/2000/svg';
+function niceMax(v){ const p = Math.pow(10, Math.floor(Math.log10(v))); const n = v/p; return (n<=1?1:n<=2?2:n<=2.5?2.5:n<=5?5:10)*p; }
+
+function renderFlowChart(){
+  const svg = document.getElementById('chartFlow');
+  const W=640, H=260, m={l:58,r:8,t:10,b:28};
+  const iw=W-m.l-m.r, ih=H-m.t-m.b;
+  const max = niceMax(Math.max(...FLUXO.entradas, ...FLUXO.saidas));
+  const y = v => m.t + ih - v/max*ih;
+  const band = iw/12, bw = Math.min(16, band*0.32);
+  let s = `<defs><pattern id="hR" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="#00978A" opacity=".35"/><line x1="0" y1="0" x2="0" y2="5" stroke="#00978A" stroke-width="2"/></pattern>
+    <pattern id="hD" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="5" fill="#3560B0" opacity=".35"/><line x1="0" y1="0" x2="0" y2="5" stroke="#3560B0" stroke-width="2"/></pattern></defs>`;
+  for(let i=0;i<=4;i++){ const v=max*i/4; s += `<line x1="${m.l}" x2="${W-m.r}" y1="${y(v)}" y2="${y(v)}" stroke="#CFE3F7" stroke-width="1"/><text x="${m.l-8}" y="${y(v)+4}" text-anchor="end" font-family="IBM Plex Mono" font-size="10" fill="#6A83A6">${fmtK(v).replace('R$ ','')}</text>`; }
+  const xProj = m.l + band*(FLUXO.realizadoAte+1);
+  s += `<rect x="${xProj}" y="${m.t}" width="${W-m.r-xProj}" height="${ih}" fill="#F3EBD6" opacity=".55"/><text x="${xProj+6}" y="${m.t+12}" font-family="IBM Plex Mono" font-size="9.5" fill="#A9750F" letter-spacing=".08em">PROJEÇÃO</text>`;
+  const bar = (x, v, fill) => { const h = Math.max(1, v/max*ih); const yy = m.t+ih-h; const r = Math.min(4, h/2, bw/2); return `<path d="M${x},${m.t+ih} V${yy+r} Q${x},${yy} ${x+r},${yy} H${x+bw-r} Q${x+bw},${yy} ${x+bw},${yy+r} V${m.t+ih} Z" fill="${fill}"/>`; };
+  MESES.forEach((mm,i) => {
+    const cx = m.l + band*i + band/2, proj = i > FLUXO.realizadoAte;
+    s += bar(cx - bw - 1, FLUXO.entradas[i], proj ? 'url(#hR)' : '#00978A');
+    s += bar(cx + 1, FLUXO.saidas[i], proj ? 'url(#hD)' : '#3560B0');
+    s += `<text x="${cx}" y="${H-8}" text-anchor="middle" font-family="IBM Plex Mono" font-size="10.5" fill="#48607F">${mm}</text>`;
+    s += `<rect class="hit" data-i="${i}" x="${m.l+band*i}" y="${m.t}" width="${band}" height="${ih}" fill="transparent"/>`;
+  });
+  s += `<line x1="${m.l}" x2="${W-m.r}" y1="${m.t+ih}" y2="${m.t+ih}" stroke="#7089AC" stroke-width="1"/>`;
+  // rótulo direto no pico (abril)
+  s += `<text x="${m.l+band*3+band/2+bw+4}" y="${y(FLUXO.entradas[3])+10}" font-family="IBM Plex Mono" font-size="10" fill="#16233F">${fmtK(FLUXO.entradas[3])}</text>`;
+  svg.innerHTML = s;
+  svg.querySelectorAll('.hit').forEach(r => {
+    const i = +r.dataset.i;
+    r.addEventListener('mousemove', e => showTip(e, `<b>${MESES[i]}/2026</b> ${i>FLUXO.realizadoAte?'· projeção':'· realizado'}<br>Entradas ${fmt(FLUXO.entradas[i])}<br>Saídas ${fmt(FLUXO.saidas[i])}<br>Saldo do mês ${fmt(FLUXO.entradas[i]-FLUXO.saidas[i])}`));
+    r.addEventListener('mouseleave', hideTip);
   });
 }
 
-// ---------- render inicial ----------
-function renderAll(){
-  renderResumo(currentFase);
-  renderFaseRows(currentFase);
-  renderLedger(currentFase, currentStatus);
+function renderSaldoChart(){
+  const svg = document.getElementById('chartSaldo');
+  const W=440, H=260, m={l:58,r:14,t:14,b:28};
+  const iw=W-m.l-m.r, ih=H-m.t-m.b;
+  // cenário: sem 115k (out) e 30k (nov)
+  const riskM = new Array(12).fill(0); RECEB.filter(r=>r.ano===2026 && r.status==='risk').forEach(r=>riskM[r.mes-1]+=r.valor);
+  let acc=0; const risk = FLUXO.saldo.map((v,i)=>{ acc+=riskM[i]; return v-acc; });
+  const max = niceMax(Math.max(...FLUXO.saldo));
+  const x = i => m.l + iw*i/11, y = v => m.t + ih - v/max*ih;
+  let s = '';
+  for(let i=0;i<=4;i++){ const v=max*i/4; s += `<line x1="${m.l}" x2="${W-m.r}" y1="${y(v)}" y2="${y(v)}" stroke="#CFE3F7"/><text x="${m.l-8}" y="${y(v)+4}" text-anchor="end" font-family="IBM Plex Mono" font-size="10" fill="#6A83A6">${fmtK(v).replace('R$ ','')}</text>`; }
+  s += `<rect x="${x(FLUXO.realizadoAte)}" y="${m.t}" width="${x(11)-x(FLUXO.realizadoAte)}" height="${ih}" fill="#F3EBD6" opacity=".55"/>`;
+  const path = arr => arr.map((v,i)=>`${i?'L':'M'}${x(i)},${y(v)}`).join(' ');
+  const riskPath = risk.map((v,i)=> i<8 ? null : `${i===8?'M':'L'}${x(i)},${y(v)}`).filter(Boolean).join(' ');
+  s += `<path d="${riskPath}" fill="none" stroke="#C94A32" stroke-width="2" stroke-dasharray="5 4"/>`;
+  s += `<path d="${path(FLUXO.saldo)}" fill="none" stroke="#00978A" stroke-width="2"/>`;
+  FLUXO.saldo.forEach((v,i)=>{ s += `<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="#00978A" stroke="#F6FAFE" stroke-width="2"/>`; });
+  [9,10,11].forEach(i=>{ s += `<circle cx="${x(i)}" cy="${y(risk[i])}" r="4" fill="#C94A32" stroke="#F6FAFE" stroke-width="2"/>`; });
+  MESES.forEach((mm,i)=>{ s += `<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-family="IBM Plex Mono" font-size="10" fill="#48607F">${mm}</text>`; });
+  s += `<text x="${x(11)-10}" y="${y(risk[11])+18}" text-anchor="end" font-family="IBM Plex Mono" font-size="10" fill="#16233F">${fmtK(FLUXO.saldo[11])}</text>`;
+  s += `<text x="${x(11)-10}" y="${y(risk[11])+31}" text-anchor="end" font-family="IBM Plex Mono" font-size="10" fill="#C94A32">${fmtK(risk[11])}</text>`;
+  s += `<line x1="${m.l}" x2="${W-m.r}" y1="${m.t+ih}" y2="${m.t+ih}" stroke="#7089AC"/>`;
+  for(let i=0;i<12;i++){ s += `<rect class="hit" data-i="${i}" x="${x(i)-iw/22}" y="${m.t}" width="${iw/11}" height="${ih}" fill="transparent"/>`; }
+  svg.innerHTML = s;
+  svg.querySelectorAll('.hit').forEach(r => {
+    const i = +r.dataset.i;
+    r.addEventListener('mousemove', e => showTip(e, `<b>${MESES[i]}/2026</b> ${i>FLUXO.realizadoAte?'· projeção':'· realizado'}<br>Saldo ${fmt(FLUXO.saldo[i])}${i>=9?`<br><span style="color:#F2A497">Sem a 16ª (vídeo): ${fmt(risk[i])}</span>`:''}`));
+    r.addEventListener('mouseleave', hideTip);
+  });
 }
-renderAll();
-renderAnalysis();
 
-// ---------- wiring dos filtros ----------
-document.getElementById('faseFilter').addEventListener('click', (e) => {
-  const btn = e.target.closest('.pill');
-  if(!btn) return;
-  currentFase = btn.dataset.fase;
-  document.querySelectorAll('#faseFilter .pill').forEach(p => p.classList.toggle('active', p === btn));
-  renderAll();
+function renderFluxoTable(){
+  const t = document.getElementById('fluxoTable');
+  const contr = new Array(12).fill(0);
+  RECEB.filter(r=>r.ano===2026).forEach(r=>contr[r.mes-1]+=r.valor);
+  const outras = FLUXO.entradas.map((v,i)=>v-contr[i]);
+  const c1 = new Array(12).fill(0), c2 = new Array(12).fill(0);
+  RECEB.filter(r=>r.ano===2026).forEach(r=>{ (r.c==='c1'?c1:c2)[r.mes-1]+=r.valor; });
+  const S = a => a.reduce((s,v)=>s+v,0);
+  const cls = i => i>FLUXO.realizadoAte ? 'proj' : '';
+  const row = (lab, arr, extra='', total=true, rcls='') => `<tr class="${rcls}"><td>${lab}</td>${arr.map((v,i)=>`<td class="${cls(i)} ${extra}">${Math.abs(v)>0.5?fmtK(v).replace('R$ ',''):'<span class="dim">—</span>'}</td>`).join('')}<td>${total?fmtK(S(arr)).replace('R$ ',''):''}</td></tr>`;
+  let h = `<thead><tr><th>R$</th>${MESES.map((mm,i)=>`<th>${mm}${i>FLUXO.realizadoAte?'*':''}</th>`).join('')}<th>Total</th></tr></thead><tbody>`;
+  h += row('Entradas', FLUXO.entradas, '', true, 'l0');
+  h += row('Contrato original (Fase 1)', c1, '', true, 'l1');
+  h += row('4º Aditivo (Fase 2)', c2, '', true, 'l1');
+  h += row('Rendimentos e outras entradas', outras, '', true, 'l1');
+  h += row('Saídas', FLUXO.saidas, '', true, 'l0');
+  h += row('Resultado do mês', FLUXO.entradas.map((v,i)=>v-FLUXO.saidas[i]), '', true, 'l1');
+  h += `<tr class="total"><td>Saldo acumulado</td>${FLUXO.saldo.map((v,i)=>`<td class="${cls(i)}">${fmtK(v).replace('R$ ','')}</td>`).join('')}<td></td></tr>`;
+  h += `<tr class="note-row"><td colspan="14">* Projeção. Valores em R$ mil/mi. Saídas de out–dez = orçamento a executar (comprometido + saldo) distribuído pela planilha.</td></tr></tbody>`;
+  t.innerHTML = h;
+
+  const pend27 = RECEB.filter(r=>r.ano===2027).reduce((s,r)=>s+r.valor,0);
+  document.getElementById('reserveCards').innerHTML = `
+    <div class="card mini"><div class="k-label">Saldo projetado dez/2026</div><div class="k-val" style="color:var(--river)">${fmt(FLUXO.saldo[11])}</div><div class="k-sub">= reserva contrato 1 + reserva contrato 2</div></div>
+    <div class="card mini"><div class="k-label">Reservas</div><div class="k-sub" style="font-size:12.5px;line-height:1.8;color:var(--text)">Finalização contrato 1 <b style="float:right">${fmt(FLUXO.reservaC1)}</b><br>Contrato 2 (aditivo) <b style="float:right">${fmt(FLUXO.reservaC2)}</b></div><div class="k-sub">Contrato 2 ainda sem previsão de despesas</div></div>
+    <div class="card mini"><div class="k-label">A receber em 2027</div><div class="k-val" style="color:var(--gold)">${fmt(pend27)}</div><div class="k-sub">${fmt(380000)} contrato 1 · ${fmt(pend27-380000)} aditivo</div></div>`;
+}
+
+// =====================================================================
+// 06 ANÁLISES
+// =====================================================================
+function renderAnalysis(){
+  const forn = {};
+  MXM.filter(r=>r.forn && !/Salários|IOF|IR apl/.test(r.forn)).forEach(r=>{ forn[r.forn]=(forn[r.forn]||0)+r.real+r.comp; });
+  const top = Object.entries(forn).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  const tmax = top[0][1];
+  const consult = MXM.filter(r=>r.conta==='Consultoria Especializada');
+  const consultOrc = consult.reduce((s,r)=>s+r.orc,0);
+  const consultSaldo = consult.reduce((s,r)=>s+r.saldo,0);
+  const cards = [
+    { cls:'risk', label:'risco · receita 2026',
+      title:'Só o vídeo institucional (R$ 30 mil) ameaça o recebimento de outubro',
+      body:`<p>Dos <span class="fg">${fmt(115000)}</span> planejados para outubro, <span class="fg">${fmt(85000)}</span> (Plano de Gestão) já foram entregues e só falta faturar. O <span class="fg">vídeo institucional</span> (${fmt(30000)}, prazo 30/09) depende da gravação feita em 08/10: a prévia sai em 22/10 e a versão final por volta de 06/11. Com isso, o recebimento tende a ficar para novembro ou depois.</p><p>O impacto no caixa é pequeno: o saldo de dez/2026 cairia de <span class="fg">${fmt(532851)}</span> para <span class="fg">${fmt(502851)}</span>, se o pagamento ficar para 2027. O projeto básico do mobiliário é entregue hoje (prazo 14/10) e o executivo, no fim de outubro, dentro do prazo de 30/10.</p>` },
+    { cls:'watch', label:'atenção · contrato 1',
+      title:'Os últimos R$ 380 mil do contrato original passaram para 2027',
+      body:`<p>As <span class="fg">Entregas Físicas de Acessibilidade</span> (R$ 360 mil) e o <span class="fg">Relatório Final</span> do Eixo Museológico (R$ 20 mil) estão vencidos desde 12/09/2025. Dependem da obra física, fora do controle direto da consultoria.</p><p>A planilha mantém <span class="fg">${fmt(342851)}</span> reservados para a finalização do contrato 1, o que dá cobertura de caixa ao custo remanescente enquanto o recebimento não ocorre.</p>` },
+    { cls:'info', label:'concentração · despesas',
+      title:`Consultoria Especializada responde por ${pct(consultOrc,D.orc).toFixed(0)}% do orçamento 2026`,
+      body:`<p><span class="fg">${fmt(consultOrc)}</span> orçados no centro de custo Financeiro DIR. Desse valor, <span class="fg">${fmt(consultSaldo)}</span> ainda estão sem fornecedor, o que corresponde a ${pct(consultSaldo,D.saldo).toFixed(0)}% de todo o saldo a executar. É a linha que mais pesa nas saídas projetadas de out–dez.</p><p>Em seguida vêm a <span class="fg">Coordenação IDG</span> (R$ 245 mil: R$ 190 mil realizados e R$ 55 mil comprometidos) e os <span class="fg">Tributos sobre Receitas</span> (R$ 191,5 mil, cerca de 12,6% das parcelas do contrato 1 recebidas em 2026).</p>` },
+    { cls:'info', label:'fornecedores · 2026',
+      title:'Principais fornecedores (realizado + comprometido)',
+      body:`<ul class="rank">${top.map(([n,v])=>`<li><span class="nm">${esc(n)}</span><span class="vl">${fmt(v)}</span><span class="bb"><span style="width:${v/tmax*100}%"></span></span></li>`).join('')}</ul>` },
+    { cls:'ok', label:'estabilidade · caixa',
+      title:'Caixa positivo em todos os meses de 2026',
+      body:`<p>O menor saldo do ano foi <span class="fg">${fmt(76889)}</span> em março, antes da entrada de R$ 1,25 mi em abril. O pico foi de <span class="fg">${fmt(1418993)}</span> em junho. A queda do 2º semestre reflete a execução do orçamento sem novas parcelas relevantes do contrato 1.</p>` },
+    { cls:'watch', label:'conciliação',
+      title:'Diferença de R$ 50 mil entre produtos e recebimentos do contrato 1',
+      body:`<p>Os 14 entregáveis somam <span class="fg">${fmt(2550000)}</span> nominais, contra <span class="fg">${fmt(2500000)}</span> do contrato no Excel. A diferença aparece no lote recebido em abr/2026: R$ 1,25 mi para seis produtos que somam R$ 1,30 mi. Convém identificar qual produto teve valor ajustado e corrigir a planilha de controle de entregas.</p>` },
+  ];
+  document.getElementById('analysisGrid').innerHTML = cards.map(c=>`<div class="card a-card"><div class="a-label ${c.cls}">${c.label}</div><h3>${c.title}</h3>${c.body}</div>`).join('');
+}
+
+// =====================================================================
+// RENDER
+// =====================================================================
+function setFase(f){
+  currentFase = f;
+  document.querySelectorAll('#faseFilter .pill').forEach(p => p.classList.toggle('active', p.dataset.fase === f));
+  renderResumo(); renderReceitas(); renderLedger();
+}
+document.getElementById('faseFilter').addEventListener('click', e => { const b = e.target.closest('.pill'); if(b) setFase(b.dataset.fase); });
+document.getElementById('statusFilter').addEventListener('click', e => {
+  const b = e.target.closest('.pill'); if(!b) return;
+  currentStatus = b.dataset.status;
+  document.querySelectorAll('#statusFilter .pill').forEach(p => p.classList.toggle('active', p === b));
+  renderLedger();
 });
 
-document.getElementById('statusFilter').addEventListener('click', (e) => {
-  const btn = e.target.closest('.pill');
-  if(!btn) return;
-  currentStatus = btn.dataset.status;
-  document.querySelectorAll('#statusFilter .pill').forEach(p => p.classList.toggle('active', p === btn));
-  renderLedger(currentFase, currentStatus);
-});
+renderResumo(); renderReceitas(); renderLedger(); renderDespesas();
+renderFlowChart(); renderSaldoChart(); renderFluxoTable(); renderAnalysis();
 </script>
 </body>
 </html>
